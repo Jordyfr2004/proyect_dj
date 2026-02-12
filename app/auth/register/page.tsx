@@ -1,71 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({
-    nombre: "",
-    telefono: "",
-    email: "",
-    password: ""
-  });
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(form)
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.error);
-      return;
-    }
-
-    alert("Usuario creado correctamente");
-  };
+  useEffect(() => {
+    // Redireccionar a login con parámetro para mostrar formulario de registro
+    router.push("/auth/login?mode=register");
+  }, [router]);
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-sm">
-      <input
-        type="text"
-        placeholder="Nombre"
-        value={form.nombre}
-        onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-        required
-      />
-
-      <input
-        type="tel"
-        placeholder="Teléfono"
-        value={form.telefono}
-        onChange={(e) => setForm({ ...form, telefono: e.target.value })}
-      />
-
-      <input
-        type="email"
-        placeholder="Email"
-        value={form.email}
-        onChange={(e) => setForm({ ...form, email: e.target.value })}
-        required
-      />
-
-      <input
-        type="password"
-        placeholder="Password"
-        value={form.password}
-        onChange={(e) => setForm({ ...form, password: e.target.value })}
-        required
-        minLength={6}
-      />
-
-      <button type="submit">Registrar</button>
-    </form>
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-900 mx-auto"></div>
+        <p className="text-zinc-400 mt-4">Redireccionando...</p>
+      </div>
+    </div>
   );
 }

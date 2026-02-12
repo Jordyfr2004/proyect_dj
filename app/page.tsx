@@ -293,11 +293,14 @@ export default function Home() {
           Tecnología sólida, estética oscura y comunidad auténtica.
         </p>
 
-        <button 
-          className="mt-8 sm:mt-10 px-8 sm:px-10 py-3 sm:py-4 text-sm sm:text-base rounded-full bg-red-900 hover:bg-red-800 transition-all duration-300 shadow-lg shadow-red-900/40 hover:scale-105 relative z-10"
-        >
-          Crear Cuenta
-        </button>
+        <div className="mt-8 sm:mt-10 relative z-10">
+          <a 
+            href="/auth/login"
+            className="px-8 sm:px-10 py-3 sm:py-4 text-sm sm:text-base rounded-full bg-red-900 hover:bg-red-800 text-zinc-100 transition-all duration-300 shadow-lg shadow-red-900/40 hover:scale-105 inline-block text-center"
+          >
+            Empezar
+          </a>
+        </div>
       </section>
 
       {/* FLECHA FLOTANTE */}
