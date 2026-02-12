@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 
@@ -7,8 +7,13 @@ export function useAuth() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const initRef = useRef(false);
 
   useEffect(() => {
+    // Prevenir ejecución doble en Strict Mode
+    if (initRef.current) return;
+    initRef.current = true;
+
     // Verificar sesión actual
     const checkSession = async () => {
       try {
