@@ -88,12 +88,147 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Orbe rojo de fondo */}
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-900/20 rounded-full blur-3xl" />
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-red-900/15 rounded-full blur-3xl" />
+      {/* Gradiente radial de fondo */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(127,29,29,0.15),_transparent_70%)]" />
       
-      <div className="w-full max-w-md relative z-10">
-        <div className="bg-zinc-950 rounded-lg shadow-2xl shadow-red-900/40 p-8 border border-zinc-800">
+      {/* Orbes flotantes con efecto de bajos */}
+      <div className="absolute -top-60 -right-60 w-96 h-96 bg-red-900/30 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute -bottom-60 -left-60 w-96 h-96 bg-red-900/25 rounded-full blur-3xl animate-pulse" style={{animationDelay: "0.5s"}} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-red-900/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: "1s"}} />
+      
+      <div className="w-full max-w-md relative z-10 fixed sm:relative bottom-0 sm:bottom-auto left-0 sm:left-auto right-0 sm:right-auto">
+        {/* Contenedor desktop con tarjeta */}
+        <div className="hidden sm:block bg-zinc-950 rounded-lg shadow-2xl shadow-red-900/40 p-8 border border-zinc-800">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent mb-2">
+              DJ CONTROL HUB
+            </h1>
+            <p className="text-zinc-400 text-sm">
+              Crea tu cuenta - Paso {step}/3
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* PASO 1: Nombre */}
+            {step === 1 && (
+              <div>
+                <label htmlFor="nombre" className="block text-sm font-medium text-zinc-300 mb-2">
+                  Nombre Completo
+                </label>
+                <input
+                  id="nombre"
+                  type="text"
+                  placeholder="Juan Pérez"
+                  value={form.nombre}
+                  onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                  autoFocus
+                  className="w-full px-4 py-3 border border-zinc-700 bg-zinc-900 text-zinc-100 placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-red-800 outline-none transition"
+                />
+              </div>
+            )}
+
+            {/* PASO 2: Email y Teléfono */}
+            {step === 2 && (
+              <>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-2">
+                    Correo Electrónico
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="tu@email.com"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    autoFocus
+                    className="w-full px-4 py-3 border border-zinc-700 bg-zinc-900 text-zinc-100 placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-red-800 outline-none transition"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="telefono" className="block text-sm font-medium text-zinc-300 mb-2">
+                    Teléfono
+                  </label>
+                  <input
+                    id="telefono"
+                    type="tel"
+                    placeholder="+34 612 345 678"
+                    value={form.telefono}
+                    onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+                    className="w-full px-4 py-3 border border-zinc-700 bg-zinc-900 text-zinc-100 placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-red-800 outline-none transition"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* PASO 3: Contraseña */}
+            {step === 3 && (
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-zinc-300 mb-2">
+                  Contraseña
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  autoFocus
+                  minLength={6}
+                  className="w-full px-4 py-3 border border-zinc-700 bg-zinc-900 text-zinc-100 placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-red-800 outline-none transition"
+                />
+                <p className="text-zinc-500 text-xs mt-2">Mínimo 6 caracteres</p>
+              </div>
+            )}
+
+            {/* Buttons */}
+            <div className="flex gap-3 mt-8">
+              {/* Botón Atrás - Solo si no estamos en paso 1 */}
+              {step > 1 && (
+                <button
+                  type="button"
+                  onClick={handlePrevStep}
+                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-semibold py-3 rounded-lg transition duration-200"
+                >
+                  Atrás
+                </button>
+              )}
+
+              {/* Botón siguiente/enviar */}
+              <button
+                type="submit"
+                disabled={loading}
+                className={`${step > 1 ? "flex-1" : "w-full"} bg-red-900 hover:bg-red-800 disabled:bg-red-900/50 disabled:cursor-not-allowed text-zinc-100 font-semibold py-3 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg shadow-red-900/40`}
+              >
+                {loading ? "Cargando..." : step === 3 ? "Crear Cuenta" : "Siguiente"}
+              </button>
+            </div>
+
+            {/* Message */}
+            {message && (
+              <div className={`text-center text-sm font-semibold pt-4 ${
+                message.type === "error" ? "text-red-500" : "text-green-500"
+              }`}>
+                {message.text}
+              </div>
+            )}
+          </form>
+
+          {/* Footer */}
+          <div className="mt-6 text-center">
+            <p className="text-zinc-400 text-sm">
+              ¿Ya tienes cuenta?{" "}
+              <Link href="/auth/login" className="text-red-500 hover:text-red-400 font-semibold">
+                Inicia sesión aquí
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Contenedor móviles sin tarjeta */}
+        <div className="sm:hidden p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent mb-2">
