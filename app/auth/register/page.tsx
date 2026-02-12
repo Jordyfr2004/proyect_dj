@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase/client";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -14,7 +15,21 @@ export default function RegisterPage() {
     password: ""
   });
   const [loading, setLoading] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
+
+  // Verificar si ya está logueado
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        router.replace("/platform");
+      } else {
+        setCheckingAuth(false);
+      }
+    };
+    checkAuth();
+  }, [router]);
 
   const handleNextStep = () => {
     setMessage(null);
@@ -55,18 +70,41 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
+      // Registrar usuario con Supabase (esto guarda cookies automáticamente)
+      const { data, error } = await supabase.auth.signUp({
+        email: form.email.trim().toLowerCase(),
+        password: form.password
+      });
+
+      if (error) {
+        setMessage({ type: "error", text: error.message });
+        setLoading(false);
+        return;
+      }
+
+      if (!data.user) {
+        setMessage({ type: "error", text: "No se pudo crear el usuario" });
+        setLoading(false);
+        return;
+      }
+
+      // Crear perfil en la base de datos
       const res = await fetch("/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(form)
+        body: JSON.stringify({
+          userId: data.user.id,
+          nombre: form.nombre,
+          telefono: form.telefono,
+          email: form.email
+        })
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        setMessage({ type: "error", text: data.error });
+        const errorData = await res.json();
+        setMessage({ type: "error", text: errorData.error });
         setLoading(false);
         return;
       }
@@ -76,10 +114,10 @@ export default function RegisterPage() {
       setStep(1);
       setLoading(false);
       
-      // Redirigir al login después de 2 segundos
+      // Redirigir al login después de 1.5 segundos
       setTimeout(() => {
         router.push("/auth/login");
-      }, 2000);
+      }, 1500);
     } catch (error) {
       setMessage({ type: "error", text: "Error en la solicitud" });
       setLoading(false);
@@ -96,7 +134,19 @@ export default function RegisterPage() {
       <div className="absolute -bottom-60 -left-60 w-96 h-96 bg-red-900/25 rounded-full blur-3xl animate-pulse" style={{animationDelay: "0.5s"}} />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-red-900/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: "1s"}} />
       
-      <div className="w-full max-w-md relative z-10 fixed sm:relative bottom-0 sm:bottom-auto left-0 sm:left-auto right-0 sm:right-auto">
+      {/* Loader mientras verifica sesión */}
+      {checkingAuth && (
+        <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+          <div className="flex flex-col items-center justify-center">
+            <div className="w-12 h-12 border-4 border-red-900/30 border-t-red-900 rounded-full animate-spin mb-4" />
+            <p className="text-zinc-400 text-sm">Cargando...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Formulario - solo mostrar si no está verificando */}
+      {!checkingAuth && (
+        <div className="w-full max-w-md relative z-10 fixed sm:relative bottom-0 sm:bottom-auto left-0 sm:left-auto right-0 sm:right-auto">
         {/* Contenedor desktop con tarjeta */}
         <div className="hidden sm:block bg-zinc-950 rounded-lg shadow-2xl shadow-red-900/40 p-8 border border-zinc-800">
           {/* Header */}
@@ -356,7 +406,8 @@ export default function RegisterPage() {
             </p>
           </div>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

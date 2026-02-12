@@ -3,14 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const { userId, email, nombre, telefono } = body;
-
-  if (!userId || !nombre || !telefono || !email) {
-    return NextResponse.json({ 
-      error: "Datos incompletos" 
-    }, { status: 400 });
-  }
+  const { email, password } = await req.json();
 
   const cookieStore = await cookies();
 
@@ -31,20 +24,13 @@ export async function POST(req: Request) {
     }
   );
 
-  // Crear perfil en la tabla profiles
-  const { error: profileError } = await supabase
-    .from("profiles")
-    .insert({
-      id: userId,
-      nombre: nombre.trim(),
-      telefono: telefono.trim(),
-      email: email.trim().toLowerCase()
-    });
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email.trim().toLowerCase(),
+    password
+  });
 
-  if (profileError) {
-    return NextResponse.json({ 
-      error: profileError.message 
-    }, { status: 400 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
   return NextResponse.json({ success: true });
