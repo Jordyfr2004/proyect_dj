@@ -1,60 +1,43 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import Link from "next/link";
 
-export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [mounted, setMounted] = useState(false);
+export default function LoginPage() {
   const [form, setForm] = useState({
-    nombre: "",
-    telefono: "",
     email: "",
-    password: "",
-    confirmPassword: ""
+    password: ""
   });
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // Leer parámetros después de montar
-    const params = new URLSearchParams(window.location.search);
-    const mode = params.get("mode");
-    if (mode === "register") {
-      setIsLogin(false);
-    }
-    setMounted(true);
-  }, []);
+  const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setMessage(null);
 
     try {
-      const endpoint = isLogin ? "/api/login" : "/api/register";
-      const payload = isLogin 
-        ? { email: form.email, password: form.password }
-        : { nombre: form.nombre, telefono: form.telefono, email: form.email, password: form.password };
-
-      const res = await fetch(endpoint, {
+      const res = await fetch("/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(form)
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error);
+        setMessage({ type: "error", text: data.error });
         setLoading(false);
         return;
       }
 
-      alert(isLogin ? "Sesión iniciada correctamente" : "Usuario creado correctamente");
-      setForm({ nombre: "", telefono: "", email: "", password: "", confirmPassword: "" });
+      setMessage({ type: "success", text: "Sesión iniciada correctamente" });
+      setForm({ email: "", password: "" });
       setLoading(false);
     } catch (error) {
-      alert("Error en la solicitud");
+      setMessage({ type: "error", text: "Error en la solicitud" });
       setLoading(false);
     }
   };
@@ -73,73 +56,12 @@ export default function AuthPage() {
               DJ CONTROL HUB
             </h1>
             <p className="text-zinc-400 text-sm">
-              {isLogin ? "Inicia sesión en tu cuenta" : "Crea tu cuenta para continuar"}
+              Inicia sesión en tu cuenta
             </p>
           </div>
 
-          {/* Toggle Buttons */}
-          <div className="flex gap-0 mb-8 bg-zinc-900 rounded-full p-1 border border-zinc-700">
-            <button
-              type="button"
-              onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2 px-4 rounded-full font-semibold transition-all duration-200 ${
-                isLogin
-                  ? "bg-red-900 text-zinc-100 shadow-lg shadow-red-900/40"
-                  : "text-zinc-400 hover:text-zinc-300"
-              }`}
-            >
-              Iniciar Sesión
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2 px-4 rounded-full font-semibold transition-all duration-200 ${
-                !isLogin
-                  ? "bg-red-900 text-zinc-100 shadow-lg shadow-red-900/40"
-                  : "text-zinc-400 hover:text-zinc-300"
-              }`}
-            >
-              Registrarse
-            </button>
-          </div>
-
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Nombre Input - Solo en registro */}
-            {!isLogin && (
-              <div>
-                <label htmlFor="nombre" className="block text-sm font-medium text-zinc-300 mb-2">
-                  Nombre Completo
-                </label>
-                <input
-                  id="nombre"
-                  type="text"
-                  placeholder="Juan Pérez"
-                  value={form.nombre}
-                  onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                  required={!isLogin}
-                  className="w-full px-4 py-3 border border-zinc-700 bg-zinc-900 text-zinc-100 placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-red-800 outline-none transition"
-                />
-              </div>
-            )}
-
-            {/* Teléfono Input - Solo en registro */}
-            {!isLogin && (
-              <div>
-                <label htmlFor="telefono" className="block text-sm font-medium text-zinc-300 mb-2">
-                  Teléfono
-                </label>
-                <input
-                  id="telefono"
-                  type="tel"
-                  placeholder="+34 612 345 678"
-                  value={form.telefono}
-                  onChange={(e) => setForm({ ...form, telefono: e.target.value })}
-                  className="w-full px-4 py-3 border border-zinc-700 bg-zinc-900 text-zinc-100 placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-red-800 outline-none transition"
-                />
-              </div>
-            )}
-
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Input */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-2">
@@ -177,11 +99,30 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-red-900 hover:bg-red-800 disabled:bg-red-900/50 disabled:cursor-not-allowed text-zinc-100 font-semibold py-3 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg shadow-red-900/40 mt-6"
+              className="w-full bg-red-900 hover:bg-red-800 disabled:bg-red-900/50 disabled:cursor-not-allowed text-zinc-100 font-semibold py-3 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg shadow-red-900/40"
             >
-              {loading ? "Cargando..." : isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
+              {loading ? "Cargando..." : "Iniciar Sesión"}
             </button>
+
+            {/* Message */}
+            {message && (
+              <div className={`text-center text-sm font-semibold pt-2 ${
+                message.type === "error" ? "text-red-500" : "text-green-500"
+              }`}>
+                {message.text}
+              </div>
+            )}
           </form>
+
+          {/* Footer */}
+          <div className="mt-6 text-center">
+            <p className="text-zinc-400 text-sm">
+              ¿No tienes cuenta?{" "}
+              <Link href="/auth/register" className="text-red-500 hover:text-red-400 font-semibold">
+                Regístrate aquí
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
