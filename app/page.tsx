@@ -250,8 +250,8 @@ export default function Home() {
             <div className="absolute inset-0 flex flex-col justify-end p-20">
               <h3 className="text-3xl sm:text-4xl font-bold text-white mb-3 leading-relaxed">
                 <span className="block">MÚSICA AL</span>
-                <span className="block sm:pl-10 md:pl-10">ALCANCE DE</span>
-                <span className="block sm:pl-20 md:pl-26">TUS MANOS</span>
+                <span className="block pl-4 sm:pl-10 md:pl-10">ALCANCE DE</span>
+                <span className="block pl-8 sm:pl-20 md:pl-26">TUS MANOS</span>
               </h3>
             </div>
           </div>
