@@ -7,6 +7,7 @@ export default function PlatformPage() {
   const { user, loading, logoutLoading, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
 
   if (loading) {
     return (
@@ -104,7 +105,38 @@ export default function PlatformPage() {
 
       {/* Navbar */}
       <nav className="bg-zinc-950 border-b border-zinc-800 sticky top-0 z-40">
-        <div className="flex items-center justify-between h-16 px-6">
+        
+        {/* Mobile Search Expanded */}
+        {searchExpanded && (
+          <div className="sm:hidden bg-zinc-950 border-b border-zinc-800 px-4 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-1 relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="¿Qué quieres buscar?"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                  className="w-full pl-10 pr-4 py-3 bg-zinc-900 border border-zinc-700 rounded-full text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-red-900 focus:ring-2 focus:ring-red-900/30 transition"
+                />
+              </div>
+              <button
+                onClick={() => setSearchExpanded(false)}
+                className="p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-400 hover:text-zinc-200"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Navbar Content */}
+        <div className={`flex items-center justify-between h-16 px-6 ${searchExpanded && 'sm:flex hidden'}`}>
           
           {/* Menu Toggle (Mobile) */}
           <button
@@ -123,9 +155,9 @@ export default function PlatformPage() {
             </h1>
           </div>
 
-          {/* Search Input */}
-          <div className="flex-1 mx-8">
-            <div className="relative">
+          {/* Search Input - Hidden on Mobile when not expanded */}
+          <div className="hidden sm:flex flex-1 mx-8">
+            <div className="relative w-full">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -138,6 +170,16 @@ export default function PlatformPage() {
               />
             </div>
           </div>
+
+          {/* Search Button - Mobile Only */}
+          <button
+            onClick={() => setSearchExpanded(true)}
+            className="sm:hidden p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
 
           {/* User Icon */}
           <div className="mr-6 flex-shrink-0">
