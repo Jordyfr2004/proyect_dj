@@ -5,9 +5,7 @@ import Image from "next/image";
 export default function Home() {
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const [scrollY, setScrollY] = useState(0);
-  const [musicStarted, setMusicStarted] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     // Scroll listener para capturar scrollY
@@ -40,43 +38,10 @@ export default function Home() {
     return () => observerRef.current?.disconnect();
   }, []);
 
-  // Reproducir música una sola vez al interactuar
-  useEffect(() => {
-    if (musicStarted) return;
 
-    const playMusic = () => {
-      if (!musicStarted && audioRef.current) {
-        audioRef.current.play().catch(() => {});
-        setMusicStarted(true);
-      }
-    };
-
-    window.addEventListener("click", playMusic);
-    window.addEventListener("scroll", playMusic);
-
-    return () => {
-      window.removeEventListener("click", playMusic);
-      window.removeEventListener("scroll", playMusic);
-    };
-  }, [musicStarted]);
-
-  // Limpiar audio al desmontar
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
 
   return (
     <div className="bg-black text-zinc-200 scroll-smooth relative overflow-x-hidden">
-      {/* Elemento de audio invisible */}
-      <audio ref={audioRef} onEnded={() => {}} preload="auto">
-        <source src="/Romeo Santos, El Chaval de la Bachata - Canalla (Official Video).mp3" type="audio/mpeg" />
-      </audio>
-
       {/* HERO */}
       <section
         id="hero"
@@ -127,19 +92,19 @@ export default function Home() {
       {/* FEATURES */}
       <section
         id="features"
-        className="min-h-screen flex flex-col items-center justify-center px-6 py-16 relative overflow-hidden bg-black"
+        className="min-h-screen flex flex-col items-center justify-center px-0 sm:px-6 py-16 relative overflow-hidden bg-black"
       >
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-12 text-zinc-100 relative z-10 animate-fadeIn">
           Lo que puedes hacer
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl relative z-10 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 sm:gap-8 max-w-7xl relative z-10 w-full">
 
           {/* Descargar Música */}
           <div 
             id="card-1"
             data-reveal
-            className="group relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer"
+            className="group relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer md:animate-glow-red"
             style={{
               opacity: visibleCards.has("card-1") ? 1 : 0,
               transform: visibleCards.has("card-1") 
@@ -170,7 +135,7 @@ export default function Home() {
           <div 
             id="card-2"
             data-reveal
-            className="group relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer"
+            className="group relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer md:animate-glow-red"
             style={{
               opacity: visibleCards.has("card-2") ? 1 : 0,
               transform: visibleCards.has("card-2") 
@@ -201,7 +166,7 @@ export default function Home() {
           <div 
             id="card-3"
             data-reveal
-            className="group relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer"
+            className="group relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer md:animate-glow-red"
             style={{
               opacity: visibleCards.has("card-3") ? 1 : 0,
               transform: visibleCards.has("card-3") 
@@ -231,13 +196,13 @@ export default function Home() {
         </div>
 
         {/* Grid secundario para las 2 últimas tarjetas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-7xl relative z-10 w-full mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 sm:gap-8 max-w-7xl relative z-10 w-full mt-8">
 
           {/* DJ EDITS + TOOLS */}
           <div 
             id="card-4"
             data-reveal
-            className="group relative h-80 rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer"
+            className="group relative h-80 rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer md:animate-glow-red"
             style={{
               opacity: visibleCards.has("card-4") ? 1 : 0,
               transform: visibleCards.has("card-4") 
@@ -268,7 +233,7 @@ export default function Home() {
           <div 
             id="card-5"
             data-reveal
-            className="group relative h-80 rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer"
+            className="group relative h-80 rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer md:animate-glow-red"
             style={{
               opacity: visibleCards.has("card-5") ? 1 : 0,
               transform: visibleCards.has("card-5") 
@@ -378,6 +343,22 @@ export default function Home() {
 
         .animate-bass-pulse {
           animation: bass-pulse 0.6s ease-in-out infinite;
+        }
+
+        /* Glow rojo oscuro destello solo en pantallas grandes */
+        @keyframes glow-red {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(127, 29, 29, 0.4), 0 0 40px rgba(127, 29, 29, 0.2);
+          }
+          50% {
+            box-shadow: 0 0 30px rgba(153, 27, 27, 0.6), 0 0 60px rgba(127, 29, 29, 0.3);
+          }
+        }
+
+        @media (min-width: 768px) {
+          .md\\:animate-glow-red {
+            animation: glow-red 3s ease-in-out infinite !important;
+          }
         }
 
         /* Perspective para 3D */

@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function PlatformPage() {
   const { user, loading, logoutLoading, logout } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
 
   if (loading) {
     return (
@@ -21,7 +23,7 @@ export default function PlatformPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-zinc-200 px-6 py-12">
+    <div className="min-h-screen bg-black text-zinc-200">
       
       {/* Loader de logout - overlay */}
       {logoutLoading && (
@@ -33,68 +35,48 @@ export default function PlatformPage() {
         </div>
       )}
       
-      {/* Header con Logout */}
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-start mb-12">
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-zinc-100 to-zinc-500 bg-clip-text text-transparent">
-              Bienvenido a la Plataforma
+      {/* Navbar */}
+      <nav className="bg-zinc-950 border-b border-zinc-800 sticky top-0 z-40">
+        <div className="flex items-center justify-between h-16 px-6">
+          
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">
+              DJ HUB
             </h1>
-            <p className="text-zinc-400 mt-4 max-w-2xl">
-              Este es tu espacio privado dentro de DJ Control Hub.  
-              Aquí podrás conectar con otros DJs, compartir sets,
-              descubrir eventos y expandir tu presencia en la escena.
-            </p>
           </div>
+
+          {/* Search Input */}
+          <div className="flex-1 mx-8">
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="¿Qué quieres buscar?"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-zinc-900 border border-zinc-700 rounded-full text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-red-900 focus:ring-2 focus:ring-red-900/30 transition"
+              />
+            </div>
+          </div>
+
+          {/* Logout Button */}
           <button
             onClick={logout}
             disabled={logoutLoading}
-            className="bg-red-900 hover:bg-red-800 disabled:bg-red-900/50 disabled:cursor-not-allowed text-zinc-100 font-semibold py-2 px-6 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg shadow-red-900/40 whitespace-nowrap"
+            className="bg-red-900 hover:bg-red-800 disabled:bg-red-900/50 disabled:cursor-not-allowed text-zinc-100 font-semibold py-2 px-6 rounded-full transition duration-200 transform hover:scale-105 shadow-lg shadow-red-900/40 whitespace-nowrap"
           >
             {logoutLoading ? 'Cerrando...' : 'Cerrar Sesión'}
           </button>
         </div>
+      </nav>
 
-        {/* Secciones simuladas tipo red social */}
-        <div className="grid md:grid-cols-3 gap-8">
-
-          {/* Feed */}
-          <div className="md:col-span-2 bg-zinc-950 p-6 rounded-xl border border-zinc-800 shadow-lg shadow-black/40">
-            <h2 className="text-xl font-semibold text-zinc-100 mb-4">
-              Feed de la Comunidad
-            </h2>
-            <p className="text-zinc-400 text-sm">
-              Aquí aparecerán publicaciones de DJs, nuevos lanzamientos,
-              clips de sesiones y anuncios de eventos.
-            </p>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-
-            <div className="bg-zinc-950 p-6 rounded-xl border border-zinc-800">
-              <h3 className="text-lg font-semibold text-zinc-100 mb-2">
-                Tu Perfil
-              </h3>
-              <p className="text-zinc-400 text-sm">
-                Gestiona tu identidad artística, bio, redes sociales
-                y estadísticas de rendimiento.
-              </p>
-            </div>
-
-            <div className="bg-zinc-950 p-6 rounded-xl border border-zinc-800">
-              <h3 className="text-lg font-semibold text-zinc-100 mb-2">
-                Eventos Cercanos
-              </h3>
-              <p className="text-zinc-400 text-sm">
-                Descubre clubs, festivales y colaboraciones
-                disponibles en tu ciudad.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </div>
+      {/* Main Content (Empty for now) */}
+      <main className="p-6">
+        {/* Aquí irá el contenido principal */}
+      </main>
     </div>
   );
 }

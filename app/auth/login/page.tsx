@@ -11,6 +11,7 @@ export default function LoginPage() {
     email: "",
     password: ""
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
@@ -115,16 +116,33 @@ export default function LoginPage() {
               <label htmlFor="password" className="block text-sm font-medium text-zinc-300 mb-2">
                 Contraseña
               </label>
-              <input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required
-                minLength={6}
-                className="w-full px-4 py-3 border border-zinc-700 bg-zinc-900 text-zinc-100 placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-red-800 outline-none transition"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  required
+                  minLength={6}
+                  className="w-full px-4 py-3 pr-10 border border-zinc-700 bg-zinc-900 text-zinc-100 placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-red-800 outline-none transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200 transition flex items-center justify-center"
+                >
+                  {showPassword ? (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M11.99 5C6.47 5 2.25 8.15 1 12.35c.5 1.42 1.3 2.72 2.26 3.88L2.42 17.07c-.46.46-.46 1.21 0 1.67.23.23.54.34.84.34.3 0 .61-.11.84-.34L5.87 15.7c1.44 1.12 3.21 1.8 5.12 1.8s3.68-.68 5.12-1.8l2.71 2.71c.23.23.54.34.84.34.3 0 .61-.11.84-.34.46-.46.46-1.21 0-1.67l-1.85-1.85c.96-1.16 1.76-2.46 2.26-3.88C21.75 8.15 17.53 5 11.99 5zm0 9c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Submit Button */}
@@ -192,16 +210,33 @@ export default function LoginPage() {
               <label htmlFor="password" className="block text-sm font-medium text-zinc-300 mb-2">
                 Contraseña
               </label>
-              <input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required
-                minLength={6}
-                className="w-full px-4 py-3 border border-zinc-700 bg-zinc-900 text-zinc-100 placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-red-800 outline-none transition"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  required
+                  minLength={6}
+                  className="w-full px-4 py-3 pr-10 border border-zinc-700 bg-zinc-900 text-zinc-100 placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-red-800 outline-none transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200 transition flex items-center justify-center"
+                >
+                  {showPassword ? (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M11.99 5C6.47 5 2.25 8.15 1 12.35c.5 1.42 1.3 2.72 2.26 3.88L2.42 17.07c-.46.46-.46 1.21 0 1.67.23.23.54.34.84.34.3 0 .61-.11.84-.34L5.87 15.7c1.44 1.12 3.21 1.8 5.12 1.8s3.68-.68 5.12-1.8l2.71 2.71c.23.23.54.34.84.34.3 0 .61-.11.84-.34.46-.46.46-1.21 0-1.67l-1.85-1.85c.96-1.16 1.76-2.46 2.26-3.88C21.75 8.15 17.53 5 11.99 5zm0 9c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Submit Button */}
