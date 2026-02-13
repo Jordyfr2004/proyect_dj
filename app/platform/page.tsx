@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 export default function PlatformPage() {
   const { user, loading, logoutLoading, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (loading) {
     return (
@@ -35,10 +36,86 @@ export default function PlatformPage() {
         </div>
       )}
       
+      {/* Sidebar Overlay (Mobile) */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <aside className={`fixed left-0 top-16 bottom-0 w-64 bg-zinc-950 border-r border-zinc-800 transition-transform duration-300 z-40 ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
+        <div className="p-6 space-y-6 h-full overflow-y-auto">
+          
+          {/* Logo/Brand */}
+          <div className="pb-4 border-b border-zinc-800">
+            <h2 className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Menú</h2>
+          </div>
+
+          {/* Menu Items */}
+          <nav className="space-y-3">
+            <a href="#" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition text-zinc-300 hover:text-red-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4" />
+              </svg>
+              <span className="font-medium">Inicio</span>
+            </a>
+            
+            <a href="#" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition text-zinc-300 hover:text-red-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+              </svg>
+              <span className="font-medium">Mis Sets</span>
+            </a>
+            
+            <a href="#" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition text-zinc-300 hover:text-red-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              <span className="font-medium">Explorar</span>
+            </a>
+            
+            <a href="#" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition text-zinc-300 hover:text-red-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m0 0l-2-1m2 1v2.5M14 4l-2 1m0 0L10 4m2 1v2.5" />
+              </svg>
+              <span className="font-medium">Comunidad</span>
+            </a>
+            
+            <a href="#" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition text-zinc-300 hover:text-red-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              </svg>
+              <span className="font-medium">Configuración</span>
+            </a>
+          </nav>
+
+          {/* Footer Section */}
+          <div className="absolute bottom-6 left-6 right-6">
+            <div className="pt-4 border-t border-zinc-800">
+              <p className="text-xs text-zinc-500 text-center">DJ HUB © 2026</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
       {/* Navbar */}
       <nav className="bg-zinc-950 border-b border-zinc-800 sticky top-0 z-40">
         <div className="flex items-center justify-between h-16 px-6">
           
+          {/* Menu Toggle (Mobile) */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="lg:hidden p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
           {/* Logo */}
           <div className="flex-shrink-0">
             <h1 className="text-xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">
@@ -62,6 +139,13 @@ export default function PlatformPage() {
             </div>
           </div>
 
+          {/* User Icon */}
+          <div className="mr-6 flex-shrink-0">
+            <svg className="w-8 h-8 text-red-900" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+            </svg>
+          </div>
+
           {/* Logout Button */}
           <button
             onClick={logout}
@@ -73,8 +157,8 @@ export default function PlatformPage() {
         </div>
       </nav>
 
-      {/* Main Content (Empty for now) */}
-      <main className="p-6">
+      {/* Main Content */}
+      <main className="lg:ml-64 p-6">
         {/* Aquí irá el contenido principal */}
       </main>
     </div>
