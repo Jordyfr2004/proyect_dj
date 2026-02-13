@@ -124,7 +124,7 @@ export default function PlatformPage() {
           {/* Footer Section */}
           <div className="absolute bottom-6 left-6 right-6">
             <div className="pt-4 border-t border-zinc-800">
-              <p className="text-xs text-zinc-500 text-center">DJ HUB © 2026</p>
+              <p className="text-xs text-zinc-500 text-center">Zona Mix © 2026</p>
             </div>
           </div>
         </div>
@@ -163,14 +163,14 @@ export default function PlatformPage() {
         )}
 
         {/* Navbar Content */}
-        <div className={`flex items-center justify-between h-16 px-6 ${searchExpanded && 'sm:flex hidden'}`}>
+        <div className={`flex items-center justify-between h-16 px-6 gap-2 sm:gap-0 ${searchExpanded && 'sm:flex hidden'}`}>
           
           {/* Menu Toggle (Mobile) */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500"
+            className="lg:hidden p-2 sm:p-1 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 border-r border-zinc-800 pr-4"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-7 h-7 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
@@ -178,7 +178,7 @@ export default function PlatformPage() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <h1 className="text-xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">
-              DJ HUB
+              Zona Mix
             </h1>
           </div>
 
@@ -198,41 +198,45 @@ export default function PlatformPage() {
             </div>
           </div>
 
-          {/* Search Button - Mobile Only */}
-          <button
-            onClick={() => setSearchExpanded(true)}
-            className="sm:hidden p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </button>
+          {/* Right Icons Container */}
+          <div className="flex items-center gap-1 sm:gap-0">
+            
+            {/* Search Button - Mobile Only */}
+            <button
+              onClick={() => setSearchExpanded(true)}
+              className="sm:hidden p-3 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 border-r border-zinc-800"
+            >
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
 
-          {/* Home Icon */}
-          <a
-            href="/platform"
-            className="p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4" />
-            </svg>
-          </a>
+            {/* Home Icon */}
+            <a
+              href="/platform"
+              className="p-3 sm:p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 border-r border-zinc-800 sm:border-r-0 sm:mr-2"
+            >
+              <svg className="w-7 h-7 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4" />
+              </svg>
+            </a>
 
-          {/* Downloads Icon */}
-          <a
-            href="#"
-            className="p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-          </a>
+            {/* Downloads Icon */}
+            <a
+              href="#"
+              className="p-3 sm:p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 border-r border-zinc-800 sm:border-r-0 sm:mr-2"
+            >
+              <svg className="w-7 h-7 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            </a>
 
-          {/* User Icon */}
-          <div className="mr-6 flex-shrink-0">
-            <svg className="w-8 h-8 text-red-900" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-            </svg>
+            {/* User Icon */}
+            <div className="p-3 sm:p-2 sm:mr-6">
+              <svg className="w-7 h-7 sm:w-8 sm:h-8 text-red-900" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+              </svg>
+            </div>
           </div>
 
           {/* Logout Button - Desktop Only */}

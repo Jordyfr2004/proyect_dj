@@ -61,7 +61,7 @@ export default function Home() {
         {/* Contenido superpuesto */}
         <div className="relative z-10 h-full min-h-screen flex flex-col items-center justify-center text-center px-6">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white animate-fadeIn drop-shadow-lg mb-4">
-            DJ CONTROL HUB
+            ZONA MIX
           </h1>
 
           <p className="mt-4 sm:mt-6 max-w-3xl text-base sm:text-lg md:text-xl text-zinc-200 leading-relaxed animate-fadeIn delay-200">

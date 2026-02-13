@@ -86,7 +86,7 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent mb-2">
-              DJ CONTROL HUB
+              ZONA MIX
             </h1>
             <p className="text-zinc-400 text-sm">
               Inicia sesión en tu cuenta
@@ -180,7 +180,7 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent mb-2">
-              DJ CONTROL HUB
+              ZONA MIX
             </h1>
             <p className="text-zinc-400 text-sm">
               Inicia sesión en tu cuenta
