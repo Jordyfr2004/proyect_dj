@@ -135,10 +135,10 @@ export default function PlatformPage() {
         
         {/* Mobile Search Expanded */}
         {searchExpanded && (
-          <div className="sm:hidden bg-zinc-950 border-b border-zinc-800 px-4 py-4">
-            <div className="flex items-center gap-3">
+          <div className="sm:hidden bg-zinc-950 border-b border-zinc-800 px-3 py-3">
+            <div className="flex items-center gap-2">
               <div className="flex-1 relative">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
@@ -147,14 +147,14 @@ export default function PlatformPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
-                  className="w-full pl-10 pr-4 py-3 bg-zinc-900 border border-zinc-700 rounded-full text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-red-900 focus:ring-2 focus:ring-red-900/30 transition"
+                  className="w-full pl-9 pr-3 py-2 bg-zinc-900 border border-zinc-700 rounded-full text-zinc-200 text-sm placeholder-zinc-500 focus:outline-none focus:border-red-900 focus:ring-2 focus:ring-red-900/30 transition"
                 />
               </div>
               <button
                 onClick={() => setSearchExpanded(false)}
-                className="p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-400 hover:text-zinc-200"
+                className="p-1 hover:bg-zinc-900 rounded-lg transition text-zinc-400 hover:text-zinc-200"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -163,21 +163,21 @@ export default function PlatformPage() {
         )}
 
         {/* Navbar Content */}
-        <div className={`flex items-center justify-between h-16 px-6 gap-2 sm:gap-0 ${searchExpanded && 'sm:flex hidden'}`}>
+        <div className={`flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 gap-1 ${searchExpanded && 'sm:flex hidden'}`}>
           
           {/* Menu Toggle (Mobile) */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden p-2 sm:p-1 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 border-r border-zinc-800 pr-4"
+            className="lg:hidden p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500"
           >
-            <svg className="w-7 h-7 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
 
           {/* Logo */}
           <div className="flex-shrink-0">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">
+            <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">
               Zona Mix
             </h1>
           </div>
@@ -199,14 +199,14 @@ export default function PlatformPage() {
           </div>
 
           {/* Right Icons Container */}
-          <div className="flex items-center gap-1 sm:gap-0">
+          <div className="flex items-center gap-0">
             
             {/* Search Button - Mobile Only */}
             <button
               onClick={() => setSearchExpanded(true)}
-              className="sm:hidden p-3 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 border-r border-zinc-800"
+              className="sm:hidden p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500"
             >
-              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
@@ -214,9 +214,9 @@ export default function PlatformPage() {
             {/* Home Icon */}
             <a
               href="/platform"
-              className="p-3 sm:p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 border-r border-zinc-800 sm:border-r-0 sm:mr-2"
+              className="p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 sm:mr-2"
             >
-              <svg className="w-7 h-7 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4" />
               </svg>
             </a>
@@ -224,16 +224,16 @@ export default function PlatformPage() {
             {/* Downloads Icon */}
             <a
               href="#"
-              className="p-3 sm:p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 border-r border-zinc-800 sm:border-r-0 sm:mr-2"
+              className="p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 sm:mr-2"
             >
-              <svg className="w-7 h-7 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
             </a>
 
             {/* User Icon */}
-            <div className="p-3 sm:p-2 sm:mr-6">
-              <svg className="w-7 h-7 sm:w-8 sm:h-8 text-red-900" fill="currentColor" viewBox="0 0 24 24">
+            <div className="p-2 sm:mr-6">
+              <svg className="w-5 h-5 sm:w-8 sm:h-8 text-red-900" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
               </svg>
             </div>
@@ -243,7 +243,7 @@ export default function PlatformPage() {
           <button
             onClick={logout}
             disabled={logoutLoading}
-            className="hidden sm:block bg-red-900 hover:bg-red-800 disabled:bg-red-900/50 disabled:cursor-not-allowed text-zinc-100 font-semibold py-2 px-6 rounded-full transition duration-200 transform hover:scale-105 shadow-lg shadow-red-900/40 whitespace-nowrap"
+            className="hidden sm:block bg-red-900 hover:bg-red-800 disabled:bg-red-900/50 disabled:cursor-not-allowed text-zinc-100 font-semibold py-2 px-6 rounded-full transition duration-200 transform hover:scale-105 shadow-lg shadow-red-900/40 whitespace-nowrap ml-4"
           >
             {logoutLoading ? 'Cerrando...' : 'Cerrar Sesión'}
           </button>
@@ -251,8 +251,18 @@ export default function PlatformPage() {
       </nav>
 
       {/* Main Content */}
-      <main className="lg:ml-64 p-6">
-        {/* Aquí irá el contenido principal */}
+      <main className="lg:ml-64 p-6 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="mb-6 animate-pulse">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full border-4 border-red-900/30 border-t-red-900 animate-spin" />
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent mb-4">
+            En Desarrollo
+          </h2>
+          <p className="text-zinc-400 text-lg md:text-xl max-w-2xl">
+            Estamos trabajando para traerte las mejores características. Vuelve pronto.
+          </p>
+        </div>
       </main>
     </div>
   );
