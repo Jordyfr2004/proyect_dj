@@ -3,8 +3,6 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 
 export default function Home() {
-  const sections = ["hero", "features", "community"];
-  const [currentSection, setCurrentSection] = useState(0);
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const [scrollY, setScrollY] = useState(0);
   const [musicStarted, setMusicStarted] = useState(false);
@@ -12,23 +10,9 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Scroll listener para actualizar sección actual y capturar scrollY
+    // Scroll listener para capturar scrollY
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + window.innerHeight / 2;
       setScrollY(window.scrollY);
-
-      sections.forEach((id, index) => {
-        const section = document.getElementById(id);
-        if (section) {
-          const { offsetTop, offsetHeight } = section;
-          if (
-            scrollPosition >= offsetTop &&
-            scrollPosition < offsetTop + offsetHeight
-          ) {
-            setCurrentSection(index);
-          }
-        }
-      });
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -86,15 +70,6 @@ export default function Home() {
     };
   }, []);
 
-  const scrollToNext = () => {
-    if (currentSection < sections.length - 1) {
-      const nextSection = document.getElementById(
-        sections[currentSection + 1]
-      );
-      nextSection?.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
     <div className="bg-black text-zinc-200 scroll-smooth relative overflow-x-hidden">
       {/* Elemento de audio invisible */}
@@ -105,225 +80,219 @@ export default function Home() {
       {/* HERO */}
       <section
         id="hero"
-        className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden"
+        className="relative min-h-screen w-full overflow-hidden"
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(120,0,0,0.25),_transparent_70%)]" />
+        {/* Imagen de fondo tipo DJ */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url("https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1920&h=1080&fit=crop")',
+          }}
+        >
+          {/* Gradiente oscuro superpuesto */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80"></div>
+        </div>
 
-        {/* Orbe flotante con glow y efecto de bajos */}
-        <div className="absolute -top-40 -right-40 sm:-top-20 sm:-right-20 w-40 sm:w-60 md:w-80 h-40 sm:h-60 md:h-80 bg-red-900/30 rounded-full blur-3xl animate-bass-pulse" />
-        <div className="absolute -bottom-20 -left-20 sm:-bottom-10 sm:-left-10 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-red-900/20 rounded-full blur-3xl animate-bass-pulse" style={{animationDelay: "0.5s"}} />
+        {/* Contenido superpuesto */}
+        <div className="relative z-10 h-full min-h-screen flex flex-col items-center justify-center text-center px-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white animate-fadeIn drop-shadow-lg mb-4">
+            DJ CONTROL HUB
+          </h1>
 
-        <h1 className="relative text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-zinc-100 to-zinc-500 bg-clip-text text-transparent animate-fadeIn drop-shadow-lg">
-          DJ CONTROL HUB
-        </h1>
+          <p className="mt-4 sm:mt-6 max-w-3xl text-base sm:text-lg md:text-xl text-zinc-200 leading-relaxed animate-fadeIn delay-200">
+            Plataforma profesional para DJs que dominan la noche.
+            Control total. Comunidad real. Sonido sin límites.
+            <br className="hidden md:block" />
+            
+          </p>
 
-        <p className="relative mt-4 sm:mt-6 max-w-xl text-sm sm:text-base md:text-lg text-zinc-400 leading-relaxed animate-fadeIn delay-200">
-          Plataforma profesional para DJs que dominan la noche.
-          Control total. Comunidad real. Sonido sin límites.
-        </p>
+          <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row gap-4 animate-fadeIn delay-300">
+            <a
+              href="/auth/login"
+              className="px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg rounded-full bg-red-900 hover:bg-red-800 transition-all duration-300 shadow-lg shadow-red-900/60 hover:scale-105 font-semibold"
+            >
+              Empezar
+            </a>
 
-        <div className="relative mt-6 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fadeIn delay-300">
-          <a
-            href="#features"
-            className="px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base rounded-full bg-red-900 hover:bg-red-800 transition-all duration-300 shadow-lg shadow-red-900/40 hover:scale-105"
-          >
-            Descubrir
-          </a>
-
-          <a
-            href="#community"
-            className="px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base rounded-full border border-zinc-700 hover:border-red-800 hover:text-red-500 transition-all duration-300 hover:scale-105"
-          >
-            Comunidad
-          </a>
+            <a
+              href="#community"
+              className="px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg rounded-full border-2 border-zinc-200 hover:border-red-500 hover:text-red-400 transition-all duration-300 hover:scale-105 font-semibold"
+            >
+              Comunidad
+            </a>
+          </div>
         </div>
       </section>
 
       {/* FEATURES */}
       <section
         id="features"
-        className="min-h-screen flex flex-col items-center justify-center px-6 text-center bg-zinc-950 relative overflow-hidden"
+        className="min-h-screen flex flex-col items-center justify-center px-6 py-16 relative overflow-hidden bg-black"
       >
-        {/* Animated Grid Background */}
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `linear-gradient(0deg, transparent 24%, rgba(255,0,0,.05) 25%, rgba(255,0,0,.05) 26%, transparent 27%, transparent 74%, rgba(255,0,0,.05) 75%, rgba(255,0,0,.05) 76%, transparent 77%, transparent),
-                              linear-gradient(90deg, transparent 24%, rgba(255,0,0,.05) 25%, rgba(255,0,0,.05) 26%, transparent 27%, transparent 74%, rgba(255,0,0,.05) 75%, rgba(255,0,0,.05) 76%, transparent 77%, transparent)`,
-            backgroundSize: "60px 60px",
-            transform: `translateY(${Math.max(0, scrollY - 800) * 0.05}px)`,
-          }}
-        />
-
-        {/* Glow effect con bajos */}
-        <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 rounded-full blur-3xl animate-bass-pulse"
-          style={{
-            background: `radial-gradient(circle, rgba(127,29,29,${Math.min(0.4, (scrollY - 800) / 2000)}) 0%, transparent 70%)`,
-          }}
-        />
-
-        <h2 
-          className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 sm:mb-12 text-zinc-100 relative z-10 animate-fadeIn"
-          style={{
-            transform: `translateY(${Math.max(0, scrollY - 800) * 0.1}px) scale(${Math.min(1.1, 0.9 + (scrollY - 800) / 3000)})`,
-            opacity: Math.min(1, Math.max(0, (scrollY - 600) / 400)),
-          }}
-        >
-          Potencia Profesional
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-12 text-zinc-100 relative z-10 animate-fadeIn">
+          Lo que puedes hacer
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10 max-w-5xl relative z-10 px-2 sm:px-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl relative z-10 w-full">
 
+          {/* Descargar Música */}
           <div 
             id="card-1"
             data-reveal
-            className="p-5 sm:p-6 md:p-8 rounded-2xl bg-zinc-900 hover:bg-zinc-800 transition-all duration-500 shadow-lg shadow-black/40 hover:-translate-y-2 border border-zinc-800"
+            className="group relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer"
             style={{
               opacity: visibleCards.has("card-1") ? 1 : 0,
               transform: visibleCards.has("card-1") 
-                ? `translateX(0) rotateY(0deg) scale(1)` 
-                : `translateX(-80px) rotateY(25deg) scale(0.8)`,
+                ? `scale(1)` 
+                : `scale(0.8)`,
               transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
             }}
           >
-            <div style={{
-              transform: `rotateZ(${Math.max(0, scrollY - 900) * 0.5}deg)`,
-            }}>
-              <MixerIcon />
+            <div 
+              className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+              style={{
+                backgroundImage: 'url("https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=800&h=600&fit=crop")',
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
             </div>
-            <h3 className="mt-4 sm:mt-6 text-lg sm:text-xl font-semibold text-zinc-100">
-              Gestión de Sets
-            </h3>
-            <p className="mt-2 sm:mt-3 text-zinc-400 text-xs sm:text-sm">
-              Organiza, programa y analiza tus sesiones con precisión técnica.
-            </p>
+            <div className="absolute inset-0 flex flex-col justify-end p-8">
+              <h3 className="text-3xl font-bold text-white mb-3">
+                DESCARGAR MÚSICA
+              </h3>
+              <p className="text-zinc-300 text-base">
+                Accede a miles de canciones para descargar y usar en tus sets. Música de calidad profesional para todos los géneros.
+              </p>
+            </div>
           </div>
 
+          {/* Playlists de otros DJs */}
           <div 
             id="card-2"
             data-reveal
-            className="p-5 sm:p-6 md:p-8 rounded-2xl bg-zinc-900 hover:bg-zinc-800 transition-all duration-500 shadow-lg shadow-black/40 hover:-translate-y-2 border border-zinc-800"
+            className="group relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer"
             style={{
               opacity: visibleCards.has("card-2") ? 1 : 0,
               transform: visibleCards.has("card-2") 
-                ? `translateY(0) scale(1)` 
-                : `translateY(80px) scale(0.8)`,
-              transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s",
+                ? `scale(1)` 
+                : `scale(0.8)`,
+              transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s",
             }}
           >
-            <div style={{
-              transform: `rotateZ(${Math.max(0, (scrollY - 900) * 0.5 + 30)}deg)`,
-            }}>
-              <WaveIcon />
+            <div 
+              className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+              style={{
+                backgroundImage: 'url("https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&h=600&fit=crop")',
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
             </div>
-            <h3 className="mt-4 sm:mt-6 text-lg sm:text-xl font-semibold text-zinc-100">
-              Análisis de Audio
-            </h3>
-            <p className="mt-2 sm:mt-3 text-zinc-400 text-xs sm:text-sm">
-              Visualiza energía, BPM y estructura en tiempo real.
-            </p>
+            <div className="absolute inset-0 flex flex-col justify-end p-8">
+              <h3 className="text-3xl font-bold text-white mb-3">
+                PLAYLISTS DE DJs
+              </h3>
+              <p className="text-zinc-300 text-base">
+                Descubre y accede a playlists curadas por otros DJs profesionales. Inspírate con sus mejores selecciones.
+              </p>
+            </div>
           </div>
 
+          {/* Venta de Remixes */}
           <div 
             id="card-3"
             data-reveal
-            className="p-5 sm:p-6 md:p-8 rounded-2xl bg-zinc-900 hover:bg-zinc-800 transition-all duration-500 shadow-lg shadow-black/40 hover:-translate-y-2 border border-zinc-800"
+            className="group relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer"
             style={{
               opacity: visibleCards.has("card-3") ? 1 : 0,
               transform: visibleCards.has("card-3") 
-                ? `translateX(0) rotateY(0deg) scale(1)` 
-                : `translateX(80px) rotateY(-25deg) scale(0.8)`,
-              transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s",
+                ? `scale(1)` 
+                : `scale(0.8)`,
+              transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s",
             }}
           >
-            <div style={{
-              transform: `rotateZ(${Math.max(0, (scrollY - 900) * 0.5 + 60)}deg)`,
-            }}>
-              <NetworkIcon />
+            <div 
+              className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+              style={{
+                backgroundImage: 'url("https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800&h=600&fit=crop")',
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
             </div>
-            <h3 className="mt-4 sm:mt-6 text-lg sm:text-xl font-semibold text-zinc-100">
-              Red de DJs
-            </h3>
-            <p className="mt-2 sm:mt-3 text-zinc-400 text-xs sm:text-sm">
-              Conecta con artistas y promotores de la escena global.
-            </p>
+            <div className="absolute inset-0 flex flex-col justify-end p-8">
+              <h3 className="text-3xl font-bold text-white mb-3">
+                VENTA DE REMIXES
+              </h3>
+              <p className="text-zinc-300 text-base">
+                Compra y vende remixes entre colegas
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Grid secundario para las 2 últimas tarjetas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-7xl relative z-10 w-full mt-8">
+
+          {/* DJ EDITS + TOOLS */}
+          <div 
+            id="card-4"
+            data-reveal
+            className="group relative h-80 rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer"
+            style={{
+              opacity: visibleCards.has("card-4") ? 1 : 0,
+              transform: visibleCards.has("card-4") 
+                ? `scale(1)` 
+                : `scale(0.8)`,
+              transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.45s",
+            }}
+          >
+            <div 
+              className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+              style={{
+                backgroundImage: 'url("https://images.unsplash.com/photo-1501612780353-7e5c60a586d5?w=800&h=600&fit=crop")',
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+            </div>
+            <div className="absolute inset-0 flex flex-col justify-end p-8">
+              <h3 className="text-3xl font-bold text-white mb-3">
+                SETS EDITS
+              </h3>
+              <p className="text-zinc-300 text-base">
+                SET Edits personalizados que incluyen versiones Intro, Clean, Transición y mucho más.
+              </p>
+            </div>
+          </div>
+
+          {/* Aplicaciones Digitales */}
+          <div 
+            id="card-5"
+            data-reveal
+            className="group relative h-80 rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer"
+            style={{
+              opacity: visibleCards.has("card-5") ? 1 : 0,
+              transform: visibleCards.has("card-5") 
+                ? `scale(1)` 
+                : `scale(0.8)`,
+              transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s",
+            }}
+          >
+            <div 
+              className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900"
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+            </div>
+            <div className="absolute inset-0 flex flex-col justify-end p-20">
+              <h3 className="text-4xl font-bold text-white mb-3 leading-relaxed">
+                <span className="block">MÚSICA AL</span>
+                <span className="block pl-10">ALCANCE DE</span>
+                <span className="block pl-26">TUS MANOS</span>
+              </h3>
+            </div>
           </div>
 
         </div>
       </section>
-
-      {/* COMMUNITY */}
-      <section
-        id="community"
-        className="min-h-screen flex flex-col items-center justify-center px-6 text-center relative overflow-hidden"
-      >
-        {/* Gradient Orbs con efecto de bajos */}
-        <div 
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 rounded-full blur-3xl animate-bass-pulse"
-          style={{
-            background: `radial-gradient(circle, rgba(127,29,29,${Math.min(0.5, (scrollY - 1600) / 1500)}) 0%, transparent 70%)`,
-          }}
-        />
-        <div 
-          className="absolute bottom-0 right-1/4 w-40 sm:w-64 md:w-80 h-40 sm:h-64 md:h-80 rounded-full blur-3xl animate-bass-pulse"
-          style={{
-            background: `radial-gradient(circle, rgba(139,0,0,${Math.min(0.4, (scrollY - 1800) / 2000)}) 0%, transparent 70%)`,
-            animationDelay: "0.3s",
-          }}
-        />
-
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 text-zinc-100 relative z-10 animate-fadeIn"
-          style={{
-            transform: `translateY(${Math.max(0, scrollY - 1600) * 0.08}px) scale(${Math.min(1.15, 0.85 + (scrollY - 1600) / 2500)})`,
-            opacity: Math.min(1, Math.max(0, (scrollY - 1400) / 400)),
-          }}
-        >
-          La Noche Te Espera
-        </h2>
-
-        <p 
-          className="max-w-2xl text-sm sm:text-base md:text-lg text-zinc-400 leading-relaxed relative z-10 animate-fadeIn delay-200"
-          style={{
-            transform: `translateY(${Math.max(0, scrollY - 1700) * 0.06}px)`,
-            opacity: Math.min(1, Math.max(0, (scrollY - 1500) / 400)),
-          }}
-        >
-          Únete a la plataforma que redefine la cultura DJ.
-          Tecnología sólida, estética oscura y comunidad auténtica.
-        </p>
-
-        <div className="mt-8 sm:mt-10 relative z-10">
-          <a 
-            href="/auth/login"
-            className="px-8 sm:px-10 py-3 sm:py-4 text-sm sm:text-base rounded-full bg-red-900 hover:bg-red-800 text-zinc-100 transition-all duration-300 shadow-lg shadow-red-900/40 hover:scale-105 inline-block text-center"
-          >
-            Empezar
-          </a>
-        </div>
-      </section>
-
-      {/* FLECHA FLOTANTE */}
-      {currentSection < sections.length - 1 && (
-        <button
-          onClick={scrollToNext}
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 p-4 rounded-full bg-red-900 hover:bg-red-800 shadow-lg shadow-red-900/40 transition-all duration-300 animate-bounce z-50"
-        >
-          <svg
-            className="w-6 h-6 text-zinc-100"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </button>
-      )}
 
       {/* Animaciones globales */}
       <style jsx global>{`
