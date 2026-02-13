@@ -82,9 +82,16 @@ export default function PlatformPage() {
             
             <a href="#" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition text-zinc-300 hover:text-red-500">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m0 0l-2-1m2 1v2.5M14 4l-2 1m0 0L10 4m2 1v2.5" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM6 20a6 6 0 0112 0v2H6v-2z" />
               </svg>
-              <span className="font-medium">Comunidad</span>
+              <span className="font-medium">Personas</span>
+            </a>
+            
+            <a href="#" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition text-zinc-300 hover:text-red-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span className="font-medium">Descargas</span>
             </a>
             
             <button
@@ -200,6 +207,26 @@ export default function PlatformPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
+
+          {/* Home Icon */}
+          <a
+            href="/platform"
+            className="p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4" />
+            </svg>
+          </a>
+
+          {/* Downloads Icon */}
+          <a
+            href="#"
+            className="p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+          </a>
 
           {/* User Icon */}
           <div className="mr-6 flex-shrink-0">
