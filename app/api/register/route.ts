@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   const body = await req.json();
   const { userId, email, nombre, telefono } = body;
 
-  if (!userId || !nombre || !telefono || !email) {
+  if (!userId || !nombre || !telefono) {
     return NextResponse.json({ 
       error: "Datos incompletos" 
     }, { status: 400 });
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       id: userId,
       nombre: nombre.trim(),
       telefono: telefono.trim(),
-      email: email.trim().toLowerCase()
+      display_name: nombre.trim()
     });
 
   if (profileError) {

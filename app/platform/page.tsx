@@ -101,7 +101,7 @@ export default function PlatformPage() {
               <span className="font-medium">Explorar</span>
             </a>
             
-            <a href="#" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition text-zinc-300 hover:text-red-500">
+            <a href="/platform/personas" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition text-zinc-300 hover:text-red-500">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM6 20a6 6 0 0112 0v2H6v-2z" />
               </svg>
@@ -380,9 +380,17 @@ export default function PlatformPage() {
             </div>
 
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent mb-8">
-                Populares
-              </h2>
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">
+                  Populares
+                </h2>
+                <a
+                  href="/platform/personas"
+                  className="text-red-500 hover:text-red-400 transition text-sm font-medium"
+                >
+                  Ver más →
+                </a>
+              </div>
               
               {/* DJ Cards Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
