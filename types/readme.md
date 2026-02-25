@@ -59,6 +59,18 @@ for each row execute procedure public.handle_new_user();
 
 
 
+select relrowsecurity
+from pg_class
+where relname = 'profiles';
+
+
+
+
+
+
+
+
+
 
 
 

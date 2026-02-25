@@ -1,14 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { getPopularUsers } from '@/service/user.service';
+import Image from 'next/image';
 
 export default function PlatformPage() {
+  const router = useRouter();
   const { user, loading, logoutLoading, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [popularUsers, setPopularUsers] = useState<any[]>([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const users = await getPopularUsers();
+        setPopularUsers(users);
+      } catch (error) {
+        console.error('Error loading users:', error);
+      } finally {
+        setUsersLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, []);
 
   if (loading) {
     return (
@@ -232,11 +253,14 @@ export default function PlatformPage() {
             </a>
 
             {/* User Icon */}
-            <div className="p-2 sm:mr-6">
+            <a 
+              href="/platform/profile"
+              className="p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 sm:mr-6"
+            >
               <svg className="w-5 h-5 sm:w-8 sm:h-8 text-red-900" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
               </svg>
-            </div>
+            </a>
           </div>
 
           {/* Logout Button - Desktop Only */}
@@ -251,17 +275,164 @@ export default function PlatformPage() {
       </nav>
 
       {/* Main Content */}
-      <main className="lg:ml-64 p-6 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="mb-6 animate-pulse">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full border-4 border-red-900/30 border-t-red-900 animate-spin" />
+      <main className="lg:ml-64 p-6 min-h-screen">
+        <div className="max-w-7xl">
+          {/* Samplers Section */}
+          <div className="mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent mb-8">
+              Samplers
+            </h2>
+            
+            {/* Song Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {/* Card 1 */}
+              <div className="group bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition cursor-pointer shadow-lg hover:shadow-red-900/50">
+                <div className="aspect-square bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center">
+                  <svg className="w-16 h-16 text-zinc-300 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
+                  </svg>
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-red-500 transition mb-1">
+                    La Vida Es Un Carnaval - Remix Dj
+                  </h3>
+                  <p className="text-sm text-zinc-400 mb-2">Chino Dj</p>
+                  <div className="flex items-center justify-between text-xs text-zinc-500">
+                    <span>Sample</span>
+                    <svg className="w-4 h-4 text-red-900" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2 */}
+              <div className="group bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition cursor-pointer shadow-lg hover:shadow-red-900/50">
+                <div className="aspect-square bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center">
+                  <svg className="w-16 h-16 text-zinc-300 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
+                  </svg>
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-red-500 transition mb-1">
+                    El Pajaro Carnavalero Intro Remix Dj
+                  </h3>
+                  <p className="text-sm text-zinc-400 mb-2">Copa Mania Disco Movil</p>
+                  <div className="flex items-center justify-between text-xs text-zinc-500">
+                    <span>Sample</span>
+                    <svg className="w-4 h-4 text-red-900" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3 */}
+              <div className="group bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition cursor-pointer shadow-lg hover:shadow-red-900/50">
+                <div className="aspect-square bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center">
+                  <svg className="w-16 h-16 text-zinc-300 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
+                  </svg>
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-red-500 transition mb-1">
+                    Una Chica God Merengue - Intro Bass Dj
+                  </h3>
+                  <p className="text-sm text-zinc-400 mb-2">El Murcielago del Mix</p>
+                  <div className="flex items-center justify-between text-xs text-zinc-500">
+                    <span>Sample</span>
+                    <svg className="w-4 h-4 text-red-900" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 4 */}
+              <div className="group bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition cursor-pointer shadow-lg hover:shadow-red-900/50">
+                <div className="aspect-square bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center">
+                  <svg className="w-16 h-16 text-zinc-300 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
+                  </svg>
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-red-500 transition mb-1">
+                    Cumbia Chonera - Intro Bass Dj
+                  </h3>
+                  <p className="text-sm text-zinc-400 mb-2">Crossover Dj</p>
+                  <div className="flex items-center justify-between text-xs text-zinc-500">
+                    <span>Sample</span>
+                    <svg className="w-4 h-4 text-red-900" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent mb-4">
-            En Desarrollo
-          </h2>
-          <p className="text-zinc-400 text-lg md:text-xl max-w-2xl">
-            Estamos trabajando para traerte las mejores características. Vuelve pronto.
-          </p>
+
+          {/* Other Sections */}
+          <div className="space-y-12">
+            <div>
+              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent mb-8">
+                Intros
+              </h2>
+            </div>
+
+            <div>
+              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent mb-8">
+                Populares
+              </h2>
+              
+              {/* DJ Cards Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {usersLoading ? (
+                  <div className="col-span-full flex items-center justify-center py-12">
+                    <div className="w-8 h-8 border-4 border-red-900/30 border-t-red-900 rounded-full animate-spin" />
+                  </div>
+                ) : popularUsers.length > 0 ? (
+                  popularUsers.map((userItem) => (
+                    <div 
+                      key={userItem.id} 
+                      className="group text-center cursor-pointer"
+                      onClick={() => router.push(`/platform/profile/${userItem.id}`)}
+                    >
+                      <div className="relative mb-4">
+                        <div className="w-full aspect-square rounded-full bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center overflow-hidden group-hover:shadow-lg group-hover:shadow-red-900/50 transition">
+                          {userItem.avatar_url ? (
+                            <Image
+                              src={userItem.avatar_url}
+                              alt={userItem.display_name}
+                              width={160}
+                              height={160}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <svg className="w-20 h-20 text-zinc-300 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                      <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-red-500 transition mb-1">
+                        {userItem.display_name}
+                      </h3>
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-12">
+                    <p className="text-zinc-500">No hay usuarios disponibles</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent mb-8">
+                Playlists
+              </h2>
+            </div>
+          </div>
         </div>
       </main>
     </div>
