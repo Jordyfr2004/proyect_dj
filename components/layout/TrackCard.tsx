@@ -1,0 +1,140 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+
+interface TrackCardProps {
+  id: string;
+  title: string;
+  artist: string;
+  audio_url: string;
+  cover_url?: string;
+  duration?: number;
+  content_type?: string;
+}
+
+export default function TrackCard({
+  id,
+  title,
+  artist,
+  audio_url,
+  cover_url,
+  duration,
+  content_type,
+}: TrackCardProps) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const togglePlay = () => {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const handleEnded = () => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <div className="group bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition cursor-pointer shadow-lg hover:shadow-red-900/50">
+      {/* Cover */}
+      {cover_url ? (
+        <div className="aspect-square relative overflow-hidden">
+          <Image
+            src={cover_url}
+            alt={title}
+            fill
+            className="object-cover group-hover:scale-105 transition"
+          />
+          <button
+            onClick={togglePlay}
+            className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 transition"
+          >
+            <svg
+              className="w-16 h-16 text-white opacity-0 group-hover:opacity-100 transition"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </button>
+        </div>
+      ) : (
+        <div className="aspect-square bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center relative group/cover">
+          <button
+            onClick={togglePlay}
+            className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover/cover:bg-black/40 transition"
+          >
+            <svg
+              className={`w-16 h-16 transition ${
+                isPlaying ? "text-red-500" : "text-zinc-300 opacity-50 group-hover/cover:opacity-100"
+              }`}
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {/* Info */}
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-red-500 transition mb-1 truncate">
+          {title}
+        </h3>
+        <p className="text-sm text-zinc-400 mb-2 truncate">{artist}</p>
+        <div className="flex items-center justify-between text-xs text-zinc-500">
+          <div className="flex items-center gap-2">
+            {content_type && (
+              <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded capitalize">
+                {content_type}
+              </span>
+            )}
+            {duration && <span>{formatTime(duration)}</span>}
+          </div>
+          {isPlaying && (
+            <span className="text-red-500 animate-pulse">♫</span>
+          )}
+        </div>
+
+        {/* Progress Bar */}
+        {duration && (
+          <div className="mt-2 bg-zinc-700 rounded-full h-1 overflow-hidden">
+            <div
+              className="bg-red-600 h-full transition-all"
+              style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Hidden Audio Player */}
+      <audio
+        ref={audioRef}
+        src={audio_url}
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={handleEnded}
+      />
+    </div>
+  );
+}
