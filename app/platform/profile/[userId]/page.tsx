@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import EditProfileModal from '@/components/layout/EditProfileModal';
+import EditProfileDetailsModal from '@/components/layout/EditProfileDetailsModal';
 import Image from 'next/image';
 
 interface UserProfile {
@@ -27,6 +28,7 @@ export default function UserProfilePage() {
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditDetailsModalOpen, setIsEditDetailsModalOpen] = useState(false);
 
   const handleAvatarUpdated = (newAvatarUrl: string) => {
     if (profile) {
@@ -36,6 +38,16 @@ export default function UserProfilePage() {
       });
     }
     setIsEditModalOpen(false);
+  };
+
+  const handleDetailsUpdated = (newData: any) => {
+    if (profile) {
+      setProfile({
+        ...profile,
+        ...newData,
+      });
+    }
+    setIsEditDetailsModalOpen(false);
   };
 
   useEffect(() => {
@@ -163,7 +175,7 @@ export default function UserProfilePage() {
               {isOwnProfile && (
                 <div className="flex gap-3">
                   <button 
-                    onClick={() => setIsEditModalOpen(true)}
+                    onClick={() => setIsEditDetailsModalOpen(true)}
                     className="px-6 py-2 bg-red-900 hover:bg-red-800 rounded-full font-semibold transition"
                   >
                     Editar Perfil
@@ -181,6 +193,19 @@ export default function UserProfilePage() {
           userId={userId}
           currentAvatar={profile.avatar_url}
           onAvatarUpdated={handleAvatarUpdated}
+        />
+
+        {/* Edit Profile Details Modal */}
+        <EditProfileDetailsModal
+          isOpen={isEditDetailsModalOpen}
+          onClose={() => setIsEditDetailsModalOpen(false)}
+          userId={userId}
+          currentData={{
+            display_name: profile?.display_name || '',
+            nombre: profile?.nombre || '',
+            telefono: profile?.telefono || '',
+          }}
+          onProfileUpdated={handleDetailsUpdated}
         />
 
         {/* Profile Content */}

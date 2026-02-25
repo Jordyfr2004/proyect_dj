@@ -37,26 +37,6 @@ for update
 using (auth.uid() = id);
 
 
-triggers
-create function public.handle_new_user()
-returns trigger as $$
-begin
-  insert into public.profiles (id, nombre, telefono)
-  values (new.id, '', '');
-  return new;
-end;
-$$ language plpgsql security definer;
-
-create trigger on_auth_user_created
-after insert on auth.users
-for each row execute procedure public.handle_new_user();
-
-
-
-
-
-
-
 
 
 select relrowsecurity
@@ -65,7 +45,84 @@ where relname = 'profiles';
 
 
 
+# nuevas tablas
 
+tabla tracks
+
+
+create table tracks (
+  id uuid primary key default gen_random_uuid(),
+
+  user_id uuid not null references profiles(id) on delete cascade,
+
+  title text not null,
+
+  content_type text not null, 
+  -- 'remix' | 'edit' | 'mashup' | 'set'
+
+  genre text,
+
+  audio_url text not null,
+  cover_url text,
+
+  duration integer,
+  is_downloadable boolean default true,
+
+  created_at timestamptz default now()
+);
+
+
+tabla playlist
+
+create table playlists (
+  id uuid primary key default gen_random_uuid(),
+
+  user_id uuid not null references profiles(id) on delete cascade,
+
+  name text not null,
+  description text,
+  cover_url text,
+  is_public boolean default false,
+
+  created_at timestamptz default now()
+);
+
+
+Relación playlist ↔ tracks
+
+create table playlist_tracks (
+  playlist_id uuid references playlists(id) on delete cascade,
+  track_id uuid references tracks(id) on delete cascade,
+
+  position integer,
+  added_at timestamptz default now(),
+
+  primary key (playlist_id, track_id)
+);
+
+likes
+
+create table track_likes (
+  user_id uuid references profiles(id) on delete cascade,
+  track_id uuid references tracks(id) on delete cascade,
+  created_at timestamptz default now(),
+  primary key (user_id, track_id)
+);
+
+
+# nuevo buckents
+Supabase Storage
+│
+├── audio
+│     └── user_id/
+│             track_id.mp3
+│
+└── covers
+      ├── tracks/
+      └── playlists/
+
+
+elbucket es de 50 mb (validar en el frontend)
 
 
 
