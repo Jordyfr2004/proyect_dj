@@ -8,6 +8,7 @@ interface TrackData {
   title: string;
   content_type: string;
   genre?: string;
+  original_artist?: string;
   is_downloadable?: boolean;
 }
 
@@ -111,6 +112,7 @@ export async function createTrack(
         title: trackData.title.trim(),
         content_type: trackData.content_type,
         genre: trackData.genre?.trim() || null,
+        original_artist: trackData.original_artist?.trim() || null,
         audio_url: audioUrl,
         cover_url: coverUrl || null,
         duration: duration ? Math.floor(duration) : null,
@@ -223,6 +225,7 @@ export async function updateTrack(
         ...(updates.title && { title: updates.title.trim() }),
         ...(updates.content_type && { content_type: updates.content_type }),
         ...(updates.genre !== undefined && { genre: updates.genre?.trim() || null }),
+        ...(updates.original_artist !== undefined && { original_artist: updates.original_artist?.trim() || null }),
         ...(updates.is_downloadable !== undefined && { is_downloadable: updates.is_downloadable }),
       })
       .eq("id", trackId)

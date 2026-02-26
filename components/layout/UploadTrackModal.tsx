@@ -28,6 +28,7 @@ export default function UploadTrackModal({
     title: "",
     content_type: "" as ContentType,
     genre: "",
+    original_artist: "",
     audio_file: null as File | null,
     cover_file: null as File | null,
     is_downloadable: true,
@@ -146,6 +147,7 @@ export default function UploadTrackModal({
           title: formData.title.trim(),
           content_type: formData.content_type,
           genre: formData.genre || undefined,
+          original_artist: formData.original_artist || undefined,
           is_downloadable: formData.is_downloadable,
         },
         audioUrl,
@@ -158,6 +160,7 @@ export default function UploadTrackModal({
         title: "",
         content_type: "" as ContentType,
         genre: "",
+        original_artist: "",
         audio_file: null,
         cover_file: null,
         is_downloadable: true,
@@ -264,6 +267,23 @@ export default function UploadTrackModal({
                 setFormData({ ...formData, genre: e.target.value })
               }
               placeholder="Ej: Techno, House, Deep House"
+              className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600"
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* Artista Original */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Artista
+            </label>
+            <input
+              type="text"
+              value={formData.original_artist}
+              onChange={(e) =>
+                setFormData({ ...formData, original_artist: e.target.value })
+              }
+              placeholder="Ej: Nombre del Artista Original"
               className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600"
               disabled={isLoading}
             />

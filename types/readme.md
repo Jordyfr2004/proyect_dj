@@ -68,7 +68,9 @@ create table tracks (
   duration integer,
   is_downloadable boolean default true,
 
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+
+  original_artist text
 );
 
 

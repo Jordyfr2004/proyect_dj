@@ -1,21 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { getUserTracks, deleteTrack, getTrackLikeCount } from "@/service/track.service";
+import { getUserTracks, deleteTrack, getTrackLikeCount, updateTrack } from "@/service/track.service";
 import { supabase } from "@/lib/supabase/client";
 import UploadTrackModal from "@/components/layout/UploadTrackModal";
 import Image from "next/image";
 
 export default function MisSetsPage() {
   const router = useRouter();
+  const audioRef = useRef<HTMLAudioElement>(null);
   
   const [userId, setUserId] = useState<string | null>(null);
   const [tracks, setTracks] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingTrack, setEditingTrack] = useState<any | null>(null);
   const [toDelete, setToDelete] = useState<string | null>(null);
   const [likesCounts, setLikesCounts] = useState<Record<string, number>>({});
+  const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   // Obtener usuario autenticado
   useEffect(() => {
@@ -83,6 +89,40 @@ export default function MisSetsPage() {
     setTracks([newTrack, ...tracks]);
   };
 
+  const handleEditTrack = (track: any) => {
+    setEditingTrack(track);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateTrack = async (updatedData: any) => {
+    if (!userId || !editingTrack) return;
+
+    try {
+      await updateTrack(editingTrack.id, userId, {
+        title: updatedData.title,
+        content_type: updatedData.content_type,
+        genre: updatedData.genre || undefined,
+        original_artist: updatedData.original_artist || undefined,
+        is_downloadable: updatedData.is_downloadable,
+      });
+
+      // Actualizar el track en la lista
+      setTracks(
+        tracks.map((t) =>
+          t.id === editingTrack.id
+            ? { ...t, ...updatedData }
+            : t
+        )
+      );
+
+      setIsEditModalOpen(false);
+      setEditingTrack(null);
+    } catch (error) {
+      console.error("Error al actualizar track:", error);
+      alert("Error al actualizar la canción");
+    }
+  };
+
   const formatDuration = (seconds: number | null) => {
     if (!seconds) return "00:00";
     const mins = Math.floor(seconds / 60);
@@ -104,6 +144,43 @@ export default function MisSetsPage() {
     } catch (error) {
       console.error('Error al descargar:', error);
     }
+  };
+
+  const handlePlayTrack = (track: any) => {
+    if (playingTrackId === track.id && audioRef.current) {
+      if (audioRef.current.paused) {
+        audioRef.current.play();
+      } else {
+        audioRef.current.pause();
+      }
+    } else {
+      setPlayingTrackId(track.id);
+      setCurrentTime(0);
+      if (audioRef.current) {
+        audioRef.current.src = track.audio_url;
+        audioRef.current.play();
+      }
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = parseFloat(e.target.value);
+    setCurrentTime(newTime);
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+    }
+  };
+
+  const handleTrackEnd = () => {
+    setPlayingTrackId(null);
+    setCurrentTime(0);
   };
 
   if (isLoading) {
@@ -137,8 +214,7 @@ export default function MisSetsPage() {
         {/* Tracks */}
         {tracks.length === 0 ? (
           <div className="text-center py-20">
-            <div className="text-6xl mb-4">🎵</div>
-            <p className="text-gray-400 mb-4">Aún no has subido ninguna canción</p>
+            <p className="text-gray-400 mb-4 text-lg">Aún no has subido ninguna canción</p>
             <button
               onClick={() => setIsModalOpen(true)}
               className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold transition"
@@ -153,24 +229,7 @@ export default function MisSetsPage() {
                 key={track.id}
                 className="bg-gray-900 border border-gray-800 rounded-lg p-4 hover:border-red-500 transition flex items-center justify-between group"
               >
-                <div className="flex items-center flex-1 gap-4">
-                  {/* Cover */}
-                  {track.cover_url ? (
-                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                      <Image
-                        src={track.cover_url}
-                        alt={track.title}
-                        width={64}
-                        height={64}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center flex-shrink-0">
-                      <span className="text-2xl">🎵</span>
-                    </div>
-                  )}
-
+                <div className="flex items-center flex-1 gap-4 min-w-0">
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <h3 className="text-white font-semibold truncate hover:text-red-500 cursor-pointer">
@@ -185,32 +244,63 @@ export default function MisSetsPage() {
                       )}
                     </div>
                     <div className="flex gap-3 text-xs text-gray-500 mt-2">
-                      <span>⏱️ {formatDuration(track.duration)}</span>
-                      <span>❤️ {likesCounts[track.id] || 0} likes</span>
-                      {track.is_downloadable && <span>📥 Descargable</span>}
+                      <span>Duración: {formatDuration(track.duration)}</span>
+                      <span>Me gusta: {likesCounts[track.id] || 0}</span>
+                      {track.is_downloadable && <span>Descargable</span>}
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="mt-3 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePlayTrack(track);
+                          }}
+                          className="flex-shrink-0 text-red-600 hover:text-red-500 transition text-lg"
+                        >
+                          {playingTrackId === track.id && audioRef.current && !audioRef.current.paused ? "❚❚" : "▶"}
+                        </button>
+                        <input
+                          type="range"
+                          min="0"
+                          max={duration && playingTrackId === track.id ? duration : track.duration || 0}
+                          value={playingTrackId === track.id ? currentTime : 0}
+                          onChange={handleProgressChange}
+                          className="flex-1 h-1 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-red-600"
+                        />
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-400 pl-7">
+                        <span>{playingTrackId === track.id ? formatDuration(currentTime) : "00:00"}</span>
+                        <span>{formatDuration(track.duration)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2 ml-4">
+                <div className="flex gap-2 ml-4 flex-shrink-0">
                   {track.is_downloadable && (
                     <button
                       onClick={() => handleDownload(track)}
-                      className="p-2 hover:bg-green-500/20 rounded-lg transition text-gray-400 hover:text-green-400"
+                      className="px-3 py-1 hover:bg-green-500/20 rounded-lg transition text-gray-400 hover:text-green-400 text-xs font-semibold"
                       title="Descargar canción"
                     >
-                      ⬇️
+                      Descargar
                     </button>
                   )}
-                  <button className="p-2 hover:bg-gray-800 rounded-lg transition text-gray-400 hover:text-white">
-                    ✎
+                  <button
+                    onClick={() => handleEditTrack(track)}
+                    className="px-3 py-1 hover:bg-blue-500/20 rounded-lg transition text-gray-400 hover:text-blue-400 text-xs font-semibold"
+                    title="Editar canción"
+                  >
+                    Editar
                   </button>
                   <button
                     onClick={() => handleDeleteTrack(track.id)}
-                    className="p-2 hover:bg-red-500/20 rounded-lg transition text-gray-400 hover:text-red-400"
+                    className="px-3 py-1 hover:bg-red-500/20 rounded-lg transition text-gray-400 hover:text-red-400 text-xs font-semibold"
                   >
-                    🗑️
+                    Eliminar
                   </button>
                 </div>
               </div>
@@ -219,13 +309,219 @@ export default function MisSetsPage() {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Audio Element */}
+      <audio
+        ref={audioRef}
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={handleTrackEnd}
+        onLoadedMetadata={handleTimeUpdate}
+      />
+
+      {/* Modal para subir */}
       <UploadTrackModal
         userId={userId!}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onTrackUploaded={handleTrackUploaded}
       />
+
+      {/* Modal para editar */}
+      {isEditModalOpen && editingTrack && (
+        <EditTrackModal
+          track={editingTrack}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setEditingTrack(null);
+          }}
+          onUpdate={handleUpdateTrack}
+        />
+      )}
+    </div>
+  );
+}
+
+interface EditTrackModalProps {
+  track: any;
+  isOpen: boolean;
+  onClose: () => void;
+  onUpdate: (updatedData: any) => void;
+}
+
+function EditTrackModal({ track, isOpen, onClose, onUpdate }: EditTrackModalProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    title: track.title || "",
+    content_type: track.content_type || "",
+    genre: track.genre || "",
+    original_artist: track.original_artist || "",
+    is_downloadable: track.is_downloadable ?? true,
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      if (!formData.title.trim()) {
+        throw new Error("El título es requerido");
+      }
+
+      if (!formData.content_type.trim()) {
+        throw new Error("El tipo de contenido es requerido");
+      }
+
+      onUpdate(formData);
+    } catch (err: any) {
+      console.error("Error al actualizar track:", err);
+      setError(err.message || "Error al actualizar la canción");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-zinc-900 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-white">Editar Canción</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition"
+            disabled={isLoading}
+          >
+            ✕
+          </button>
+        </div>
+
+        {error && (
+          <div className="bg-red-500/20 border border-red-500 text-red-400 p-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Título */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Título *
+            </label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600"
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* Tipo de contenido */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Tipo de Contenido (ej: Set, Remix, Edit, Mashup)
+            </label>
+            <input
+              type="text"
+              value={formData.content_type}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  content_type: e.target.value,
+                })
+              }
+              className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600"
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* Género */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Género
+            </label>
+            <input
+              type="text"
+              value={formData.genre}
+              onChange={(e) =>
+                setFormData({ ...formData, genre: e.target.value })
+              }
+              className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600"
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* Artista */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Artista
+            </label>
+            <input
+              type="text"
+              value={formData.original_artist}
+              onChange={(e) =>
+                setFormData({ ...formData, original_artist: e.target.value })
+              }
+              className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600"
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* Descargable */}
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="is_downloadable"
+              checked={formData.is_downloadable}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  is_downloadable: e.target.checked,
+                })
+              }
+              className="w-4 h-4 accent-red-600"
+              disabled={isLoading}
+            />
+            <label
+              htmlFor="is_downloadable"
+              className="ml-2 text-sm text-gray-300"
+            >
+              Permitir descargas
+            </label>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition disabled:opacity-50"
+              disabled={isLoading}
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition disabled:opacity-50 flex items-center justify-center gap-2"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                "Guardar cambios"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

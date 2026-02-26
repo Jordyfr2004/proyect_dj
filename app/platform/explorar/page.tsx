@@ -45,7 +45,8 @@ export default function ExplorarPage() {
       filtered = filtered.filter(
         (track) =>
           track.title.toLowerCase().includes(query) ||
-          track.profiles?.display_name?.toLowerCase().includes(query)
+          track.profiles?.display_name?.toLowerCase().includes(query) ||
+          track.original_artist?.toLowerCase().includes(query)
       );
     }
 
@@ -56,67 +57,73 @@ export default function ExplorarPage() {
   const contentTypes = Array.from(new Set(tracks.map((t) => t.content_type))).filter(Boolean);
 
   return (
-    <div className="min-h-screen bg-black text-zinc-200 pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent mb-2">
-            Explorar
-          </h1>
-          <p className="text-zinc-400 text-lg">Descubre todas las canciones, intros y edits del DJ community</p>
-        </div>
-
-        {/* Search Bar */}
-        <div className="mb-8">
-          <div className="relative">
-            <svg
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+    <>
+      {/* Fixed Search and Filters Section */}
+      <div className="fixed top-0 md:top-0 left-0 right-0 z-40 bg-black border-b border-zinc-800 shadow-lg shadow-red-900/20 py-3 md:py-4">
+        <div className="max-w-7xl mx-auto px-3 md:px-4">
+          {/* Search Bar */}
+          <div className="mb-3 md:mb-4">
+            <div className="relative">
+              <svg
+                className="absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 md:w-5 h-4 md:h-5 text-zinc-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                type="text"
+                placeholder="Buscar canciones o artistas..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg pl-9 md:pl-12 pr-3 md:pr-4 py-2 md:py-3 text-sm md:text-base text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600/50 transition"
               />
-            </svg>
-            <input
-              type="text"
-              placeholder="Buscar canciones o artistas..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-700 rounded-lg pl-12 pr-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-red-600 transition"
-            />
+            </div>
           </div>
-        </div>
 
-        {/* Filters */}
-        <div className="mb-8 flex flex-wrap gap-3">
-          <button
-            onClick={() => setSelectedFilter(null)}
-            className={`px-4 py-2 rounded-full font-semibold transition ${
-              selectedFilter === null
-                ? 'bg-red-600 text-white'
-                : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800'
-            }`}
-          >
-            Todos
-          </button>
-          {contentTypes.map((type) => (
+          {/* Filters */}
+          <div className="flex flex-wrap gap-2 md:gap-3 overflow-x-auto pb-2 md:pb-0">
             <button
-              key={type}
-              onClick={() => setSelectedFilter(type || '')}
-              className={`px-4 py-2 rounded-full font-semibold transition capitalize ${
-                selectedFilter === type
+              onClick={() => setSelectedFilter(null)}
+              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-full text-sm md:text-base font-semibold transition whitespace-nowrap ${
+                selectedFilter === null
                   ? 'bg-red-600 text-white'
                   : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800'
               }`}
             >
-              {type}
+              Todos
             </button>
-          ))}
+            {contentTypes.map((type) => (
+              <button
+                key={type}
+                onClick={() => setSelectedFilter(type || '')}
+                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-full text-sm md:text-base font-semibold transition capitalize whitespace-nowrap ${
+                  selectedFilter === type
+                    ? 'bg-red-600 text-white'
+                    : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800'
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="min-h-screen bg-black text-zinc-200 pt-36 md:pt-40 pb-12">
+        <div className="max-w-7xl mx-auto px-3 md:px-4">
+        {/* Header */}
+        <div className="mb-8 md:mb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent mb-2">
+            Explorar
+          </h1>
+          <p className="text-xs md:text-base text-zinc-400">Descubre todas las canciones, intros y edits del DJ community</p>
         </div>
 
         {/* Results Count */}
@@ -157,7 +164,8 @@ export default function ExplorarPage() {
             ))}
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
