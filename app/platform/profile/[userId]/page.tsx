@@ -6,6 +6,8 @@ import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import EditProfileModal from '@/components/layout/EditProfileModal';
 import EditProfileDetailsModal from '@/components/layout/EditProfileDetailsModal';
+import TrackCard from '@/components/layout/TrackCard';
+import { getUserTracks } from '@/service/track.service';
 import Image from 'next/image';
 
 interface UserProfile {
@@ -29,6 +31,8 @@ export default function UserProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditDetailsModalOpen, setIsEditDetailsModalOpen] = useState(false);
+  const [userTracks, setUserTracks] = useState<any[]>([]);
+  const [tracksLoading, setTracksLoading] = useState(false);
 
   const handleAvatarUpdated = (newAvatarUrl: string) => {
     if (profile) {
@@ -86,6 +90,26 @@ export default function UserProfilePage() {
       loadProfile();
     }
   }, [userId, authUser, authLoading]);
+
+  // Cargar canciones del usuario
+  useEffect(() => {
+    const loadUserTracks = async () => {
+      if (!userId) return;
+      
+      setTracksLoading(true);
+      try {
+        const tracks = await getUserTracks(userId);
+        setUserTracks(tracks || []);
+      } catch (err) {
+        console.error('Error al cargar canciones:', err);
+        setUserTracks([]);
+      } finally {
+        setTracksLoading(false);
+      }
+    };
+
+    loadUserTracks();
+  }, [userId]);
 
   if (authLoading || loading) {
     return (
@@ -259,7 +283,7 @@ export default function UserProfilePage() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-zinc-400">Sets</span>
-                  <span className="text-red-500 font-semibold">0</span>
+                  <span className="text-red-500 font-semibold">{userTracks.length}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-zinc-400">Seguidores</span>
@@ -272,6 +296,40 @@ export default function UserProfilePage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Canciones Section */}
+        <div className="mt-12">
+          <h2 className="text-3xl font-bold mb-6">Canciones</h2>
+          
+          {tracksLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 border-4 border-red-900/30 border-t-red-900 rounded-full animate-spin mb-2" />
+                <p className="text-zinc-400">Cargando canciones...</p>
+              </div>
+            </div>
+          ) : userTracks.length === 0 ? (
+            <div className="bg-zinc-900 rounded-lg p-12 text-center">
+              <p className="text-zinc-400 text-lg">Sin contenido</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {userTracks.map((track) => (
+                <TrackCard
+                  key={track.id}
+                  id={track.id}
+                  title={track.title}
+                  artist={track.profiles?.display_name || 'Artista desconocido'}
+                  audio_url={track.audio_url}
+                  cover_url={track.cover_url}
+                  avatar_url={track.profiles?.avatar_url}
+                  duration={track.duration}
+                  content_type={track.content_type}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { useAudio } from "@/contexts/AudioContext";
 
 interface TrackCardProps {
   id: string;
@@ -9,6 +10,7 @@ interface TrackCardProps {
   artist: string;
   audio_url: string;
   cover_url?: string;
+  avatar_url?: string;
   duration?: number;
   content_type?: string;
 }
@@ -19,23 +21,39 @@ export default function TrackCard({
   artist,
   audio_url,
   cover_url,
+  avatar_url,
   duration,
   content_type,
 }: TrackCardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const { currentTrackId, setCurrentTrackId } = useAudio();
 
   const togglePlay = () => {
     if (!audioRef.current) return;
 
     if (isPlaying) {
       audioRef.current.pause();
+      setIsPlaying(false);
+      setCurrentTrackId(null);
     } else {
+      // Si hay otro track reproduciéndose, actualizar el contexto
+      if (currentTrackId !== id) {
+        setCurrentTrackId(id);
+      }
       audioRef.current.play();
+      setIsPlaying(true);
     }
-    setIsPlaying(!isPlaying);
   };
+
+  // Pausar este track si otro comienza a reproducirse
+  useEffect(() => {
+    if (currentTrackId && currentTrackId !== id && isPlaying && audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  }, [currentTrackId, id, isPlaying]);
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -99,10 +117,21 @@ export default function TrackCard({
 
       {/* Info */}
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-red-500 transition mb-1 truncate">
+        <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-red-500 transition mb-2 truncate">
           {title}
         </h3>
-        <p className="text-sm text-zinc-400 mb-2 truncate">{artist}</p>
+        <div className="flex items-center gap-2 mb-2">
+          {avatar_url && (
+            <Image
+              src={avatar_url}
+              alt={artist}
+              width={24}
+              height={24}
+              className="w-6 h-6 rounded-full object-cover flex-shrink-0"
+            />
+          )}
+          <p className="text-sm text-zinc-400 truncate">{artist}</p>
+        </div>
         <div className="flex items-center justify-between text-xs text-zinc-500">
           <div className="flex items-center gap-2">
             {content_type && (
@@ -134,6 +163,7 @@ export default function TrackCard({
         src={audio_url}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
+        crossOrigin="anonymous"
       />
     </div>
   );
