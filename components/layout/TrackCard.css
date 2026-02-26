@@ -1,0 +1,37 @@
+@keyframes scrollText {
+  0% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-100%);
+  }
+  85% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.scrolling-title-container {
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.scrolling-text {
+  animation: scrollText 10s infinite ease-in-out;
+  white-space: nowrap;
+  display: inline-block !important;
+  padding-right: 20px;
+  margin: 0;
+}
+
+.scrolling-text.inactive {
+  animation: none;
+  transform: translateX(0);
+}

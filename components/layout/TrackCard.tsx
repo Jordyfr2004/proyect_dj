@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import Image from "next/image";
 import { useAudio } from "@/contexts/AudioContext";
+import "./TrackCard.css";
 
 interface TrackCardProps {
   id: string;
@@ -30,8 +31,36 @@ export default function TrackCard({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [titleRef, setTitleRef] = useState<HTMLElement | null>(null);
+  const [isTextOverflowing, setIsTextOverflowing] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentTrackId, setCurrentTrackId } = useAudio();
+
+  useLayoutEffect(() => {
+    if (titleRef) {
+      // Usar setTimeout para asegurar que el elemento tiene su ancho final
+      const timeoutId = setTimeout(() => {
+        if (titleRef) {
+          const hasOverflow = titleRef.scrollWidth > titleRef.clientWidth;
+          setIsTextOverflowing(hasOverflow);
+        }
+      }, 0);
+      
+      // Verificar también cuando la ventana cambia de tamaño
+      const handleResize = () => {
+        if (titleRef) {
+          setIsTextOverflowing(titleRef.scrollWidth > titleRef.clientWidth);
+        }
+      };
+      
+      window.addEventListener('resize', handleResize);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+  }, [titleRef, title]);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
@@ -141,9 +170,19 @@ export default function TrackCard({
 
       {/* Info */}
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-red-500 transition mb-2 truncate">
-          {title}
-        </h3>
+        <div
+          ref={(node) => setTitleRef(node)}
+          className={`mb-2 ${isTextOverflowing && isPlaying ? 'scrolling-title-container' : ''}`}
+          title={title}
+        >
+          <h3
+            className={`text-lg font-semibold text-zinc-100 transition group-hover:text-red-500 ${
+              isTextOverflowing && isPlaying ? 'scrolling-text' : 'truncate'
+            }`}
+          >
+            {title}
+          </h3>
+        </div>
         <div className="flex items-center gap-2 mb-2">
           {avatar_url && (
             <Image

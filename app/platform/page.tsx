@@ -113,7 +113,7 @@ export default function PlatformPage() {
               <span className="font-medium">Mis Sets</span>
             </a>
             
-            <a href="#" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition text-zinc-300 hover:text-red-500">
+            <a href="/platform/explorar" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition text-zinc-300 hover:text-red-500">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
               </svg>
@@ -298,9 +298,17 @@ export default function PlatformPage() {
         <div className="max-w-7xl">
           {/* Samplers Section */}
           <div className="mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent mb-8">
-              Biblioteca
-            </h2>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">
+                Biblioteca
+              </h2>
+              <a
+                href="/platform/explorar"
+                className="text-red-500 hover:text-red-400 transition text-sm font-medium"
+              >
+                Mostrar más →
+              </a>
+            </div>
             
             {/* Song Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -316,7 +324,7 @@ export default function PlatformPage() {
                   <p className="text-lg">No hay canciones aún. ¡Sé el primero en subir!</p>
                 </div>
               ) : (
-                tracks.map((track) => (
+                tracks.slice(0, 4).map((track) => (
                   <TrackCard
                     key={track.id}
                     id={track.id}
