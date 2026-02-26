@@ -13,6 +13,7 @@ interface TrackCardProps {
   avatar_url?: string;
   duration?: number;
   content_type?: string;
+  is_downloadable?: boolean;
 }
 
 export default function TrackCard({
@@ -24,9 +25,11 @@ export default function TrackCard({
   avatar_url,
   duration,
   content_type,
+  is_downloadable = true,
 }: TrackCardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [isDownloading, setIsDownloading] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentTrackId, setCurrentTrackId } = useAudio();
 
@@ -70,6 +73,27 @@ export default function TrackCard({
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!is_downloadable || !audio_url) return;
+
+    setIsDownloading(true);
+    try {
+      const downloadUrl = `/api/download?url=${encodeURIComponent(audio_url)}&name=${encodeURIComponent(title)}`;
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `${title}.mp3`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error al descargar:', error);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -141,9 +165,33 @@ export default function TrackCard({
             )}
             {duration && <span>{formatTime(duration)}</span>}
           </div>
-          {isPlaying && (
-            <span className="text-red-500 animate-pulse">♫</span>
-          )}
+          <div className="flex items-center gap-2">
+            {isPlaying && (
+              <span className="text-red-500 animate-pulse">♫</span>
+            )}
+            {is_downloadable && (
+              <button
+                onClick={handleDownload}
+                disabled={isDownloading}
+                className="hover:text-red-500 transition disabled:opacity-50"
+                title="Descargar canción"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Progress Bar */}

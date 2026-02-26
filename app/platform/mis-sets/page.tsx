@@ -90,6 +90,22 @@ export default function MisSetsPage() {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const handleDownload = async (track: any) => {
+    if (!track.is_downloadable || !track.audio_url) return;
+
+    try {
+      const downloadUrl = `/api/download?url=${encodeURIComponent(track.audio_url)}&name=${encodeURIComponent(track.title)}`;
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `${track.title}.mp3`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error al descargar:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -178,6 +194,15 @@ export default function MisSetsPage() {
 
                 {/* Actions */}
                 <div className="flex gap-2 ml-4">
+                  {track.is_downloadable && (
+                    <button
+                      onClick={() => handleDownload(track)}
+                      className="p-2 hover:bg-green-500/20 rounded-lg transition text-gray-400 hover:text-green-400"
+                      title="Descargar canción"
+                    >
+                      ⬇️
+                    </button>
+                  )}
                   <button className="p-2 hover:bg-gray-800 rounded-lg transition text-gray-400 hover:text-white">
                     ✎
                   </button>

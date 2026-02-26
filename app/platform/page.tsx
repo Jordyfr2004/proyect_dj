@@ -327,6 +327,7 @@ export default function PlatformPage() {
                     cover_url={track.cover_url}
                     duration={track.duration}
                     content_type={track.content_type}
+                    is_downloadable={track.is_downloadable}
                   />
                 ))
               )}

@@ -326,6 +326,7 @@ export default function UserProfilePage() {
                   avatar_url={track.profiles?.avatar_url}
                   duration={track.duration}
                   content_type={track.content_type}
+                  is_downloadable={track.is_downloadable}
                 />
               ))}
             </div>
