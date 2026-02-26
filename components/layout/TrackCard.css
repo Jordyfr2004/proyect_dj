@@ -1,37 +1,44 @@
 @keyframes scrollText {
   0% {
     transform: translateX(0);
+    opacity: 1;
   }
-  15% {
+  5% {
     transform: translateX(0);
+    opacity: 1;
   }
-  50% {
+  48% {
     transform: translateX(-100%);
+    opacity: 1;
   }
-  85% {
+  80% {
     transform: translateX(-100%);
+    opacity: 1;
+  }
+  90% {
+    transform: translateX(0);
+    opacity: 0;
   }
   100% {
     transform: translateX(0);
+    opacity: 1;
   }
 }
 
 .scrolling-title-container {
-  overflow: hidden;
+  overflow: hidden !important;
   width: 100%;
   display: flex;
   align-items: center;
 }
 
 .scrolling-text {
-  animation: scrollText 10s infinite ease-in-out;
-  white-space: nowrap;
+  animation: scrollText 18s infinite ease-in-out !important;
+  white-space: nowrap !important;
   display: inline-block !important;
-  padding-right: 20px;
-  margin: 0;
-}
-
-.scrolling-text.inactive {
-  animation: none;
-  transform: translateX(0);
+  padding-right: 30px;
+  margin: 0 !important;
+  flex-shrink: 0;
+  overflow: hidden !important;
+  text-overflow: clip !important;
 }

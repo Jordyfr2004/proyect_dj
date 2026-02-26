@@ -31,25 +31,25 @@ export default function TrackCard({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [titleRef, setTitleRef] = useState<HTMLElement | null>(null);
   const [isTextOverflowing, setIsTextOverflowing] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const { currentTrackId, setCurrentTrackId } = useAudio();
 
   useLayoutEffect(() => {
-    if (titleRef) {
+    if (titleRef.current) {
       // Usar setTimeout para asegurar que el elemento tiene su ancho final
       const timeoutId = setTimeout(() => {
-        if (titleRef) {
-          const hasOverflow = titleRef.scrollWidth > titleRef.clientWidth;
+        if (titleRef.current) {
+          const hasOverflow = titleRef.current.scrollWidth > titleRef.current.clientWidth;
           setIsTextOverflowing(hasOverflow);
         }
       }, 0);
       
       // Verificar también cuando la ventana cambia de tamaño
       const handleResize = () => {
-        if (titleRef) {
-          setIsTextOverflowing(titleRef.scrollWidth > titleRef.clientWidth);
+        if (titleRef.current) {
+          setIsTextOverflowing(titleRef.current.scrollWidth > titleRef.current.clientWidth);
         }
       };
       
@@ -60,7 +60,7 @@ export default function TrackCard({
         window.removeEventListener('resize', handleResize);
       };
     }
-  }, [titleRef, title]);
+  }, [title]);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
@@ -171,12 +171,16 @@ export default function TrackCard({
       {/* Info */}
       <div className="p-4">
         <div
-          ref={(node) => setTitleRef(node)}
-          className={`mb-2 ${isTextOverflowing && isPlaying ? 'scrolling-title-container' : ''}`}
+          className={`mb-2 ${isTextOverflowing ? 'overflow-hidden' : ''} ${
+            isTextOverflowing && isPlaying ? 'scrolling-title-container' : ''
+          }`}
           title={title}
         >
           <h3
+            ref={titleRef}
             className={`text-lg font-semibold text-zinc-100 transition group-hover:text-red-500 ${
+              isTextOverflowing ? 'whitespace-nowrap' : ''
+            } ${
               isTextOverflowing && isPlaying ? 'scrolling-text' : 'truncate'
             }`}
           >
