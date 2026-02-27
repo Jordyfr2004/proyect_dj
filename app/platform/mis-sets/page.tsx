@@ -6,6 +6,7 @@ import { getUserTracks, deleteTrack, getTrackLikeCount, updateTrack } from "@/se
 import { supabase } from "@/lib/supabase/client";
 import UploadTrackModal from "@/components/layout/UploadTrackModal";
 import Image from "next/image";
+import "./page.css";
 
 export default function MisSetsPage() {
   const router = useRouter();
@@ -267,7 +268,10 @@ export default function MisSetsPage() {
                           max={duration && playingTrackId === track.id ? duration : track.duration || 0}
                           value={playingTrackId === track.id ? currentTime : 0}
                           onChange={handleProgressChange}
-                          className="flex-1 h-1 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-red-600"
+                          className="flex-1 track-progress-range"
+                          style={{
+                            '--progress-width': `${duration && playingTrackId === track.id ? (currentTime / duration) * 100 : 0}%`
+                          } as React.CSSProperties}
                         />
                       </div>
                       <div className="flex justify-between text-xs text-gray-400 pl-7">

@@ -104,6 +104,14 @@ export default function TrackCard({
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = parseFloat(e.target.value);
+    setCurrentTime(newTime);
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+    }
+  };
+
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
@@ -129,7 +137,7 @@ export default function TrackCard({
     <div className="group bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition cursor-pointer shadow-lg hover:shadow-red-900/50">
       {/* Cover */}
       {cover_url ? (
-        <div className="aspect-square relative overflow-hidden">
+        <div className="aspect-video sm:aspect-square relative overflow-hidden">
           <Image
             src={cover_url}
             alt={title}
@@ -150,7 +158,7 @@ export default function TrackCard({
           </button>
         </div>
       ) : (
-        <div className="aspect-square bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center relative group/cover">
+        <div className="aspect-video sm:aspect-square bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center relative group/cover">
           <button
             onClick={togglePlay}
             className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover/cover:bg-black/40 transition"
@@ -239,11 +247,22 @@ export default function TrackCard({
 
         {/* Progress Bar */}
         {duration && (
-          <div className="mt-2 bg-zinc-700 rounded-full h-1 overflow-hidden">
-            <div
-              className="bg-red-600 h-full transition-all"
-              style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+          <div className="mt-3 space-y-2">
+            <input
+              type="range"
+              min="0"
+              max={duration || 0}
+              value={currentTime}
+              onChange={handleProgressChange}
+              className="track-progress-range"
+              style={{
+                '--progress-width': `${duration > 0 ? (currentTime / duration) * 100 : 0}%`
+              } as React.CSSProperties}
             />
+            <div className="flex justify-between text-xs text-zinc-400">
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(duration)}</span>
+            </div>
           </div>
         )}
       </div>

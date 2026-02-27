@@ -1,54 +1,9 @@
-@keyframes scrollText {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  5% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  48% {
-    transform: translateX(-100%);
-    opacity: 1;
-  }
-  80% {
-    transform: translateX(-100%);
-    opacity: 1;
-  }
-  90% {
-    transform: translateX(0);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.scrolling-title-container {
-  overflow: hidden !important;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.scrolling-text {
-  animation: scrollText 18s infinite ease-in-out !important;
-  white-space: nowrap !important;
-  display: inline-block !important;
-  padding-right: 30px;
-  margin: 0 !important;
-  flex-shrink: 0;
-  overflow: hidden !important;
-  text-overflow: clip !important;
-}
-
 /* Track Progress Range Input */
 .track-progress-range {
   width: 100%;
   height: 4px;
   border-radius: 5px;
-  background: linear-gradient(to right, #dc2626 0%, #dc2626 var(--progress-width, 0%), #374151 var(--progress-width, 0%), #374151 100%);
+  background: linear-gradient(to right, #dc2626 0%, #dc2626 var(--progress-width, 0%), #1f2937 var(--progress-width, 0%), #1f2937 100%);
   outline: none;
   -webkit-appearance: none;
   appearance: none;
