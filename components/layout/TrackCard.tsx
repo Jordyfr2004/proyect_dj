@@ -137,7 +137,7 @@ export default function TrackCard({
   };
 
   return (
-    <div className="group bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition cursor-pointer shadow-lg hover:shadow-red-900/50">
+    <div className="group bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition cursor-pointer shadow-lg hover:shadow-slate-700/50">
       {/* Cover */}
       {cover_url ? (
         <div className="aspect-video sm:aspect-square relative overflow-hidden">
@@ -147,35 +147,16 @@ export default function TrackCard({
             fill
             className="object-cover group-hover:scale-105 transition"
           />
-          <button
-            onClick={togglePlay}
-            className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 transition"
-          >
-            <svg
-              className="w-16 h-16 text-white opacity-0 group-hover:opacity-100 transition"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </button>
         </div>
       ) : (
-        <div className="aspect-video sm:aspect-square bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center relative group/cover">
-          <button
-            onClick={togglePlay}
-            className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover/cover:bg-black/40 transition"
+        <div className="aspect-video sm:aspect-square bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center relative group/cover">
+          <svg
+            className="w-24 h-24 text-red-500"
+            fill="currentColor"
+            viewBox="0 0 24 24"
           >
-            <svg
-              className={`w-16 h-16 transition ${
-                isPlaying ? "text-red-500" : "text-zinc-300 opacity-50 group-hover/cover:opacity-100"
-              }`}
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </button>
+            <path d="M12 3v9.28c-.47-.46-1.12-.75-1.84-.75-2.49 0-4.5 2.01-4.5 4.5S7.67 21 12 21s4.5-2.01 4.5-4.5V7h4V3h-7z" />
+          </svg>
         </div>
       )}
 
@@ -189,7 +170,7 @@ export default function TrackCard({
         >
           <h3
             ref={titleRef}
-            className={`text-lg font-semibold text-zinc-100 transition group-hover:text-red-500 ${
+            className={`text-lg font-semibold text-zinc-100 transition group-hover:text-slate-300 ${
               isTextOverflowing ? 'whitespace-nowrap' : ''
             } ${
               isTextOverflowing && isPlaying ? 'scrolling-text' : 'truncate'
@@ -213,7 +194,7 @@ export default function TrackCard({
         <div className="flex items-center justify-between text-xs text-zinc-500">
           <div className="flex items-center gap-2">
             {content_type && (
-              <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded capitalize">
+              <span className="px-2 py-1 bg-slate-500/20 text-slate-300 rounded capitalize">
                 {content_type}
               </span>
             )}
@@ -221,29 +202,7 @@ export default function TrackCard({
           </div>
           <div className="flex items-center gap-2">
             {isPlaying && (
-              <span className="text-red-500 animate-pulse">♫</span>
-            )}
-            {is_downloadable && (
-              <button
-                onClick={handleDownload}
-                disabled={isDownloading}
-                className="hover:text-red-500 transition disabled:opacity-50"
-                title="Descargar canción"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                  />
-                </svg>
-              </button>
+              <span className="text-slate-400 animate-pulse">♫</span>
             )}
           </div>
         </div>
@@ -251,20 +210,62 @@ export default function TrackCard({
         {/* Progress Bar */}
         {duration && (
           <div className="mt-3 space-y-2">
-            <input
-              type="range"
-              min="0"
-              max={duration || 0}
-              value={currentTime}
-              onChange={handleProgressChange}
-              className="track-progress-range"
-              style={{
-                '--progress-width': `${duration > 0 ? (currentTime / duration) * 100 : 0}%`
-              } as React.CSSProperties}
-            />
-            <div className="flex justify-between text-xs text-zinc-400">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={togglePlay}
+                className="flex-shrink-0 text-zinc-400 hover:text-zinc-200 transition text-sm"
+              >
+                {isPlaying ? "❚❚" : "▶"}
+              </button>
+              <input
+                type="range"
+                min="0"
+                max={duration || 0}
+                value={currentTime}
+                onChange={handleProgressChange}
+                className="flex-1 track-progress-range"
+                style={{
+                  '--progress-width': `${duration > 0 ? (currentTime / duration) * 100 : 0}%`
+                } as React.CSSProperties}
+              />
+            </div>
+            <div className="flex justify-between text-xs text-zinc-400 px-1">
               <span>{formatTime(currentTime)}</span>
               <span>{formatTime(duration)}</span>
+            </div>
+            
+            {/* Like and Download */}
+            <div className="flex items-center gap-3 pt-1">
+              <button
+                className="flex items-center gap-1 text-zinc-400 hover:text-zinc-200 transition text-xs"
+                title="Me gusta"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+              </button>
+              {is_downloadable && (
+                <button
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                  className="flex items-center gap-1 text-zinc-400 hover:text-zinc-200 transition disabled:opacity-50 text-xs"
+                  title="Descargar canción"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
         )}

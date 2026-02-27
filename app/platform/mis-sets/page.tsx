@@ -301,18 +301,17 @@ export default function MisSetsPage() {
                       )}
                     </div>
                     <div className="flex flex-wrap gap-2 md:gap-3 text-xs text-gray-500 mt-2 items-center">
-                      <div className="flex items-center gap-1 text-gray-400 hover:text-red-400 transition">
+                      <div className="flex items-center gap-1 text-gray-400 hover:text-gray-200 transition">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                          <path d="M14 10h4.764a2 2 0 010 4h-3.643l-5.973 7.471A6 6 0 103 13.36l2.496-3.312H3a1 1 0 010-2h3.9a6 6 0 1010.1 9.4" />
                         </svg>
                         <span>{likesCounts[track.id] || 0}</span>
                       </div>
                       {track.is_downloadable && (
-                        <div className="flex items-center gap-1 text-gray-400 hover:text-green-400 transition">
+                        <div className="flex items-center gap-1 text-gray-400 hover:text-gray-200 transition">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                           </svg>
-                          <span>Desc.</span>
                         </div>
                       )}
                     </div>
