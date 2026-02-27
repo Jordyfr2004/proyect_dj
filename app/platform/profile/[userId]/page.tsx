@@ -320,10 +320,10 @@ export default function UserProfilePage() {
                   key={track.id}
                   id={track.id}
                   title={track.title}
-                  artist={track.profiles?.display_name || 'Artista desconocido'}
+                  artist={profile?.display_name || 'Artista desconocido'}
                   audio_url={track.audio_url}
                   cover_url={track.cover_url}
-                  avatar_url={track.profiles?.avatar_url}
+                  avatar_url={profile?.avatar_url}
                   duration={track.duration}
                   content_type={track.content_type}
                   is_downloadable={track.is_downloadable}
