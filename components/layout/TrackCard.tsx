@@ -105,6 +105,9 @@ export default function TrackCard({
   };
 
   const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Solo permitir cambiar si es la canción que se está reproduciendo
+    if (currentTrackId !== id) return;
+    
     const newTime = parseFloat(e.target.value);
     setCurrentTime(newTime);
     if (audioRef.current) {

@@ -201,7 +201,10 @@ export default function MisSetsPage() {
     }
   };
 
-  const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>, trackId: string) => {
+    // Solo permitir cambiar si es la canción que se está reproduciendo
+    if (playingTrackId !== trackId) return;
+    
     const newTime = parseFloat(e.target.value);
     setCurrentTime(newTime);
     if (audioRef.current) {
@@ -331,7 +334,7 @@ export default function MisSetsPage() {
                           min="0"
                           max={duration && playingTrackId === track.id ? duration : track.duration || 0}
                           value={playingTrackId === track.id ? currentTime : 0}
-                          onChange={handleProgressChange}
+                          onChange={(e) => handleProgressChange(e, track.id)}
                           className="flex-1 track-progress-range"
                           style={{
                             '--progress-width': `${duration && playingTrackId === track.id ? (currentTime / duration) * 100 : 0}%`
