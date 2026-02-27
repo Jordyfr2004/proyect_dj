@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { getAllTracks } from '@/service/track.service';
 import TrackCard from '@/components/layout/TrackCard';
 import Image from 'next/image';
 
 export default function ExplorarPage() {
+  const router = useRouter();
   const [tracks, setTracks] = useState<any[]>([]);
   const [filteredTracks, setFilteredTracks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,9 +63,52 @@ export default function ExplorarPage() {
       {/* Fixed Search and Filters Section */}
       <div className="fixed top-0 md:top-0 left-0 right-0 z-40 bg-black border-b border-zinc-800 shadow-lg shadow-red-900/20 py-3 md:py-4">
         <div className="max-w-7xl mx-auto px-3 md:px-4">
+          {/* Back Button Row (Mobile) */}
+          <div className="mb-2 md:hidden">
+            <button
+              onClick={() => router.back()}
+              className="p-1.5 text-zinc-400 hover:text-zinc-200 transition"
+              title="Regresar"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+          </div>
           {/* Search Bar */}
-          <div className="mb-3 md:mb-4">
-            <div className="relative">
+          <div className="mb-3 md:mb-4 flex items-center gap-2">
+            {/* Back Button (Desktop) */}
+            <button
+              onClick={() => router.back()}
+              className="hidden md:flex flex-shrink-0 p-2 text-zinc-400 hover:text-zinc-200 transition"
+              title="Regresar"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            {/* Search Input */}
+            <div className="relative flex-1">
               <svg
                 className="absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 md:w-5 h-4 md:h-5 text-zinc-500"
                 fill="none"
@@ -120,10 +165,10 @@ export default function ExplorarPage() {
         <div className="max-w-7xl mx-auto px-3 md:px-4">
         {/* Header */}
         <div className="mb-8 md:mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent mb-2">
+          <h1 className="hidden md:block text-5xl lg:text-6xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent mb-2">
             Explorar
           </h1>
-          <p className="text-xs md:text-base text-zinc-400">Descubre todas las canciones, intros y edits del DJ community</p>
+          <p className="hidden md:block text-xs md:text-base text-zinc-400">Descubre todas las canciones, intros y edits del DJ community</p>
         </div>
 
         {/* Results Count */}
