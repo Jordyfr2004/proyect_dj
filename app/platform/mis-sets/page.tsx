@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getUserTracks, deleteTrack, getTrackLikeCount, updateTrack } from "@/service/track.service";
 import { supabase } from "@/lib/supabase/client";
@@ -23,6 +23,8 @@ export default function MisSetsPage() {
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [tracksWithOverflow, setTracksWithOverflow] = useState<Set<string>>(new Set());
+  const titleRefs = useRef<Record<string, HTMLHeadingElement | null>>({});
 
   // Obtener usuario autenticado
   useEffect(() => {
@@ -68,6 +70,34 @@ export default function MisSetsPage() {
 
     loadTracks();
   }, [userId]);
+
+  // Detectar overflow en títulos
+  useLayoutEffect(() => {
+    const checkOverflow = () => {
+      const newOverflow = new Set<string>();
+      
+      Object.entries(titleRefs.current).forEach(([trackId, element]) => {
+        if (element && element.scrollWidth > element.clientWidth) {
+          newOverflow.add(trackId);
+        }
+      });
+      
+      setTracksWithOverflow(newOverflow);
+    };
+
+    const timeoutId = setTimeout(checkOverflow, 0);
+    
+    const handleResize = () => {
+      checkOverflow();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [tracks]);
 
   const handleDeleteTrack = async (trackId: string) => {
     if (!userId) return;
@@ -197,16 +227,27 @@ export default function MisSetsPage() {
 
   return (
     <div className="min-h-screen bg-black pt-20 pb-10">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-3 md:px-4">
+        {/* Botón Regreso */}
+        <a 
+          href="/platform" 
+          className="text-red-500 hover:text-red-400 transition inline-flex items-center gap-2 mb-6"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span className="text-sm md:text-base">Volver</span>
+        </a>
+
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Mis Sets</h1>
-            <p className="text-gray-400">{tracks.length} canción(es) subida(s)</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">Mis Sets</h1>
+            <p className="text-sm md:text-base text-gray-400">{tracks.length} canción(es) subida(s)</p>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold transition"
+            className="bg-red-600 hover:bg-red-700 text-white px-4 md:px-6 py-2 rounded-lg font-semibold transition whitespace-nowrap w-full md:w-auto"
           >
             + Subir Canción
           </button>
@@ -224,34 +265,57 @@ export default function MisSetsPage() {
             </button>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4 md:space-y-3">
             {tracks.map((track) => (
               <div
                 key={track.id}
-                className="bg-gray-900 border border-gray-800 rounded-lg p-4 hover:border-red-500 transition flex items-center justify-between group"
+                className="bg-gray-900 border border-gray-800 rounded-lg p-3 md:p-4 hover:border-red-500 transition flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 group"
               >
-                <div className="flex items-center flex-1 gap-4 min-w-0">
+                <div className="flex items-center flex-1 gap-3 min-w-0">
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-semibold truncate hover:text-red-500 cursor-pointer">
-                      {track.title}
-                    </h3>
-                    <div className="flex gap-2 text-sm text-gray-400 mt-1">
+                    <div
+                      className={`${tracksWithOverflow.has(track.id) ? 'scrolling-title-container' : ''}`}
+                      title={track.title}
+                    >
+                      <h3
+                        ref={(el) => {
+                          if (el) titleRefs.current[track.id] = el;
+                        }}
+                        className={`text-white font-semibold text-sm md:text-base hover:text-red-500 cursor-pointer ${
+                          tracksWithOverflow.has(track.id) ? 'whitespace-nowrap scrolling-text' : 'truncate'
+                        }`}
+                      >
+                        {track.title}
+                      </h3>
+                    </div>
+                    <div className="flex flex-wrap gap-2 text-xs md:text-sm text-gray-400 mt-1">
                       <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded capitalize">
                         {track.content_type}
                       </span>
                       {track.genre && (
-                        <span className="text-gray-500 truncate">{track.genre}</span>
+                        <span className="text-gray-500">{track.genre}</span>
                       )}
                     </div>
-                    <div className="flex gap-3 text-xs text-gray-500 mt-2">
-                      <span>Duración: {formatDuration(track.duration)}</span>
-                      <span>Me gusta: {likesCounts[track.id] || 0}</span>
-                      {track.is_downloadable && <span>Descargable</span>}
+                    <div className="flex flex-wrap gap-2 md:gap-3 text-xs text-gray-500 mt-2 items-center">
+                      <div className="flex items-center gap-1 text-gray-400 hover:text-red-400 transition">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                        <span>{likesCounts[track.id] || 0}</span>
+                      </div>
+                      {track.is_downloadable && (
+                        <div className="flex items-center gap-1 text-gray-400 hover:text-green-400 transition">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                          <span>Desc.</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="mt-3 space-y-2">
+                    <div className="mt-3 space-y-1">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={(e) => {
@@ -274,7 +338,7 @@ export default function MisSetsPage() {
                           } as React.CSSProperties}
                         />
                       </div>
-                      <div className="flex justify-between text-xs text-gray-400 pl-7">
+                      <div className="flex justify-between text-xs text-gray-500">
                         <span>{playingTrackId === track.id ? formatDuration(currentTime) : "00:00"}</span>
                         <span>{formatDuration(track.duration)}</span>
                       </div>
@@ -283,11 +347,11 @@ export default function MisSetsPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2 ml-4 flex-shrink-0">
+                <div className="flex gap-2 flex-shrink-0 w-full md:w-auto">
                   {track.is_downloadable && (
                     <button
                       onClick={() => handleDownload(track)}
-                      className="px-3 py-1 hover:bg-green-500/20 rounded-lg transition text-gray-400 hover:text-green-400 text-xs font-semibold"
+                      className="flex-1 md:flex-none px-2 md:px-3 py-1 hover:bg-green-500/20 rounded-lg transition text-gray-400 hover:text-green-400 text-xs font-semibold"
                       title="Descargar canción"
                     >
                       Descargar
@@ -295,14 +359,14 @@ export default function MisSetsPage() {
                   )}
                   <button
                     onClick={() => handleEditTrack(track)}
-                    className="px-3 py-1 hover:bg-blue-500/20 rounded-lg transition text-gray-400 hover:text-blue-400 text-xs font-semibold"
+                    className="flex-1 md:flex-none px-2 md:px-3 py-1 hover:bg-blue-500/20 rounded-lg transition text-gray-400 hover:text-blue-400 text-xs font-semibold"
                     title="Editar canción"
                   >
                     Editar
                   </button>
                   <button
                     onClick={() => handleDeleteTrack(track.id)}
-                    className="px-3 py-1 hover:bg-red-500/20 rounded-lg transition text-gray-400 hover:text-red-400 text-xs font-semibold"
+                    className="flex-1 md:flex-none px-2 md:px-3 py-1 hover:bg-red-500/20 rounded-lg transition text-gray-400 hover:text-red-400 text-xs font-semibold"
                   >
                     Eliminar
                   </button>
