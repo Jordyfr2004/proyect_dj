@@ -140,7 +140,7 @@ export default function TrackCard({
       if (!response.ok) throw new Error('Error en descarga');
 
       const contentLength = response.headers.get('content-length');
-      const total = parseInt(contentLength, 10);
+      const total = contentLength ? parseInt(contentLength, 10) : 0;
 
       const reader = response.body?.getReader();
       if (!reader) throw new Error('No se puede leer la respuesta');
