@@ -17,7 +17,7 @@ export default function DownloadNotifications() {
           <div className="flex items-start justify-between mb-2">
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-semibold text-white truncate">
-                {notif.status === 'completed' ? '✓ Descargado' : '📥 Descargándose'}
+                {notif.status === 'completed' ? 'Descargado' : 'Descargándose'}
               </h3>
               <p className="text-xs text-gray-400 truncate">{notif.title}</p>
             </div>

@@ -37,6 +37,7 @@ export default function TrackCard({
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [isTextOverflowing, setIsTextOverflowing] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const { currentTrackId, setCurrentTrackId } = useAudio();
@@ -131,28 +132,46 @@ export default function TrackCard({
     addDownload(downloadId, title);
 
     try {
-      // Simular progreso
-      let progress = 10;
-      const progressInterval = setInterval(() => {
-        progress += Math.random() * 30;
-        if (progress > 90) progress = 90;
-        updateProgress(downloadId, progress);
-      }, 300);
-
       const downloadUrl = `/api/download?url=${encodeURIComponent(audio_url)}&name=${encodeURIComponent(title)}`;
+
+      // Usar fetch con progreso real
+      const response = await fetch(downloadUrl);
+      
+      if (!response.ok) throw new Error('Error en descarga');
+
+      const contentLength = response.headers.get('content-length');
+      const total = parseInt(contentLength, 10);
+
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('No se puede leer la respuesta');
+
+      let received = 0;
+      const chunks = [];
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        chunks.push(value);
+        received += value.length;
+        
+        // Actualizar progreso basado en bytes reales
+        const progress = (received / total) * 100;
+        updateProgress(downloadId, Math.min(progress, 99));
+      }
+
+      // Combinar chunks y descargar
+      const blob = new Blob(chunks);
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = downloadUrl;
+      link.href = url;
       link.download = `${title}.mp3`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
-      // Limpiar intervalo
-      clearInterval(progressInterval);
       updateProgress(downloadId, 100);
-
-      // Simular tiempo de finalización
-      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Guardar registro de descarga
       if (userId) {
@@ -274,12 +293,16 @@ export default function TrackCard({
             {/* Like and Download */}
             <div className="flex items-center gap-3 pt-1">
               <button
-                className="flex items-center gap-1 text-zinc-400 hover:text-zinc-200 transition text-xs"
+                onClick={() => setIsLiked(!isLiked)}
+                className="flex items-center gap-1 transition text-xs"
                 title="Me gusta"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                </svg>
+                <span 
+                  className={`material-symbols-outlined transition ${isLiked ? 'text-red-500' : 'text-zinc-400 hover:text-red-500'}`} 
+                  style={{ fontSize: '20px', fontWeight: 'bold' }}
+                >
+                  thumb_up
+                </span>
               </button>
               {is_downloadable && (
                 <button

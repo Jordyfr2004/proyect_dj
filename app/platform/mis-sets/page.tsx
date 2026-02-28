@@ -340,10 +340,8 @@ export default function MisSetsPage() {
                       )}
                     </div>
                     <div className="flex flex-wrap gap-2 md:gap-3 text-xs text-gray-500 mt-2 items-center">
-                      <div className="flex items-center gap-1 text-gray-400 hover:text-gray-200 transition">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M14 10h4.764a2 2 0 010 4h-3.643l-5.973 7.471A6 6 0 103 13.36l2.496-3.312H3a1 1 0 010-2h3.9a6 6 0 1010.1 9.4" />
-                        </svg>
+                      <div className="flex items-center gap-1 text-white hover:text-white transition cursor-default">
+                        <span className="material-symbols-outlined" style={{ fontSize: '20px', fontWeight: 'bold' }}>thumb_up</span>
                         <span>{likesCounts[track.id] || 0}</span>
                       </div>
                       {track.is_downloadable && (

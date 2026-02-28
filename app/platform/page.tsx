@@ -7,6 +7,7 @@ import { getPopularUsers } from '@/service/user.service';
 import { getAllTracks } from '@/service/track.service';
 import TrackCard from '@/components/layout/TrackCard';
 import Image from 'next/image';
+import { supabase } from '@/lib/supabase/client';
 
 export default function PlatformPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function PlatformPage() {
   const [usersLoading, setUsersLoading] = useState(true);
   const [tracks, setTracks] = useState<any[]>([]);
   const [tracksLoading, setTracksLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -49,6 +51,31 @@ export default function PlatformPage() {
 
     loadTracks();
   }, []);
+
+  // Cargar perfil del usuario
+  useEffect(() => {
+    if (!user) return;
+
+    const loadUserProfile = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("id, display_name, avatar_url")
+          .eq("id", user.id)
+          .single();
+
+        if (error) {
+          console.error('Error loading user profile:', error);
+        } else {
+          setUserProfile(data);
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    };
+
+    loadUserProfile();
+  }, [user]);
 
   if (loading) {
     return (
@@ -263,7 +290,7 @@ export default function PlatformPage() {
 
             {/* Downloads Icon */}
             <a
-              href="#"
+              href="/platform/descargas"
               className="p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 sm:mr-2"
             >
               <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,9 +303,19 @@ export default function PlatformPage() {
               href="/platform/profile"
               className="p-2 hover:bg-zinc-900 rounded-lg transition text-zinc-300 hover:text-red-500 sm:mr-6"
             >
-              <svg className="w-5 h-5 sm:w-8 sm:h-8 text-red-900" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-              </svg>
+              {userProfile?.avatar_url ? (
+                <Image
+                  src={userProfile.avatar_url}
+                  alt="Usuario"
+                  width={32}
+                  height={32}
+                  className="w-5 h-5 sm:w-8 sm:h-8 rounded-full object-cover"
+                />
+              ) : (
+                <svg className="w-5 h-5 sm:w-8 sm:h-8 text-red-900" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                </svg>
+              )}
             </a>
           </div>
 

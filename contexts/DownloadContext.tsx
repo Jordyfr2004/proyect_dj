@@ -49,10 +49,10 @@ export function DownloadProvider({ children }: { children: React.ReactNode }) {
       )
     );
 
-    // Auto-remove after 2 seconds
+    // Auto-remove after 5 seconds
     setTimeout(() => {
       removeNotification(id);
-    }, 2000);
+    }, 5000);
   }, []);
 
   const removeNotification = useCallback((id: string) => {
