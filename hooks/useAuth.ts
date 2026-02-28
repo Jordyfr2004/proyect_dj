@@ -22,7 +22,7 @@ export function useAuth() {
   });
 
   const initRef = useRef(false);
-  const refreshTimeoutRef = useRef<NodeJS.Timeout>();
+  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // 🔄 Refrescar token antes de que expire
   const scheduleTokenRefresh = useCallback(async () => {
