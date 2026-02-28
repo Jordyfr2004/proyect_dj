@@ -1,11 +1,44 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase/client";
 import Image from "next/image";
 
 export default function Home() {
+  const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const [scrollY, setScrollY] = useState(0);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const checkRef = useRef(false);
+
+  // ✅ Verificar sesión y redirigir a platform si existe
+  useEffect(() => {
+    if (checkRef.current) return;
+    checkRef.current = true;
+
+    const checkSession = async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          // Usuario autenticado → ir a platform
+          router.push("/platform");
+          return;
+        }
+
+        // No hay usuario → mostrar página de inicio
+        setIsChecking(false);
+      } catch (error) {
+        console.error("[Home] Error verificando sesión:", error);
+        setIsChecking(false);
+      }
+    };
+
+    checkSession();
+  }, [router]);
 
   useEffect(() => {
     // Scroll listener para capturar scrollY
@@ -37,6 +70,15 @@ export default function Home() {
 
     return () => observerRef.current?.disconnect();
   }, []);
+
+  // Si está verificando sesión, no mostrar nada
+  if (isChecking) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-zinc-400">Cargando...</div>
+      </div>
+    );
+  }
 
 
 
