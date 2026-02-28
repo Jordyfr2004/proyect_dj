@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import Image from "next/image";
 import { useAudio } from "@/contexts/AudioContext";
+import { useDownloadNotification } from "@/contexts/DownloadContext";
+import { saveDownloadRecord } from "@/service/download.service";
 import "./TrackCard.css";
 
 interface TrackCardProps {
@@ -15,6 +17,7 @@ interface TrackCardProps {
   duration?: number;
   content_type?: string;
   is_downloadable?: boolean;
+  userId?: string | null;
 }
 
 export default function TrackCard({
@@ -27,14 +30,17 @@ export default function TrackCard({
   duration,
   content_type,
   is_downloadable = true,
+  userId = null,
 }: TrackCardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [isTextOverflowing, setIsTextOverflowing] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const { currentTrackId, setCurrentTrackId } = useAudio();
+  const { addDownload, updateProgress, completeDownload } = useDownloadNotification();
 
   useLayoutEffect(() => {
     if (titleRef.current) {
@@ -120,8 +126,19 @@ export default function TrackCard({
     
     if (!is_downloadable || !audio_url) return;
 
+    const downloadId = `download-${id}-${Date.now()}`;
     setIsDownloading(true);
+    addDownload(downloadId, title);
+
     try {
+      // Simular progreso
+      let progress = 10;
+      const progressInterval = setInterval(() => {
+        progress += Math.random() * 30;
+        if (progress > 90) progress = 90;
+        updateProgress(downloadId, progress);
+      }, 300);
+
       const downloadUrl = `/api/download?url=${encodeURIComponent(audio_url)}&name=${encodeURIComponent(title)}`;
       const link = document.createElement('a');
       link.href = downloadUrl;
@@ -129,6 +146,26 @@ export default function TrackCard({
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      // Limpiar intervalo
+      clearInterval(progressInterval);
+      updateProgress(downloadId, 100);
+
+      // Simular tiempo de finalización
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Guardar registro de descarga
+      if (userId) {
+        await saveDownloadRecord(userId, id, title);
+      }
+
+      // Mostrar animación de éxito
+      completeDownload(downloadId);
+      setDownloadSuccess(true);
+      setTimeout(() => {
+        setDownloadSuccess(false);
+      }, 2000);
+
     } catch (error) {
       console.error('Error al descargar:', error);
     } finally {
@@ -248,7 +285,13 @@ export default function TrackCard({
                 <button
                   onClick={handleDownload}
                   disabled={isDownloading}
-                  className="flex items-center gap-1 text-zinc-400 hover:text-zinc-200 transition disabled:opacity-50 text-xs"
+                  className={`flex items-center gap-1 transition disabled:opacity-50 text-xs ${
+                    downloadSuccess
+                      ? "text-green-400"
+                      : isDownloading
+                      ? "text-yellow-400 animate-pulse"
+                      : "text-zinc-400 hover:text-zinc-200"
+                  }`}
                   title="Descargar canción"
                 >
                   <svg
@@ -264,6 +307,9 @@ export default function TrackCard({
                       d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                     />
                   </svg>
+                  <span className="hidden sm:inline">
+                    {downloadSuccess ? "✓" : isDownloading ? "..." : ""}
+                  </span>
                 </button>
               )}
             </div>

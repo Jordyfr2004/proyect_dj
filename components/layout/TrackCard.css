@@ -89,3 +89,44 @@
   border-radius: 5px;
   height: 4px;
 }
+
+/* Download Button Animations */
+@keyframes downloadPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes downloadSuccess {
+  0% {
+    transform: scale(0.5) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes dotBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.download-button-downloading {
+  animation: downloadPulse 1.5s ease-in-out infinite;
+}
+
+.download-button-success {
+  animation: downloadSuccess 0.5s ease-out forwards;
+}

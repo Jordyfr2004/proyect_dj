@@ -327,6 +327,7 @@ export default function UserProfilePage() {
                   duration={track.duration}
                   content_type={track.content_type}
                   is_downloadable={track.is_downloadable}
+                  userId={authUser?.id}
                 />
               ))}
             </div>

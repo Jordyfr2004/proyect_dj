@@ -3,6 +3,8 @@
 import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getUserTracks, deleteTrack, getTrackLikeCount, updateTrack } from "@/service/track.service";
+import { saveDownloadRecord } from "@/service/download.service";
+import { useDownloadNotification } from "@/contexts/DownloadContext";
 import { supabase } from "@/lib/supabase/client";
 import UploadTrackModal from "@/components/layout/UploadTrackModal";
 import Image from "next/image";
@@ -10,6 +12,7 @@ import "./page.css";
 
 export default function MisSetsPage() {
   const router = useRouter();
+  const { addDownload, updateProgress, completeDownload } = useDownloadNotification();
   const audioRef = useRef<HTMLAudioElement>(null);
   
   const [userId, setUserId] = useState<string | null>(null);
@@ -24,6 +27,8 @@ export default function MisSetsPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [tracksWithOverflow, setTracksWithOverflow] = useState<Set<string>>(new Set());
+  const [downloadingTrackId, setDownloadingTrackId] = useState<string | null>(null);
+  const [downloadSuccess, setDownloadSuccess] = useState<string | null>(null);
   const titleRefs = useRef<Record<string, HTMLHeadingElement | null>>({});
 
   // Obtener usuario autenticado
@@ -164,7 +169,19 @@ export default function MisSetsPage() {
   const handleDownload = async (track: any) => {
     if (!track.is_downloadable || !track.audio_url) return;
 
+    const downloadId = `download-${track.id}-${Date.now()}`;
+    setDownloadingTrackId(track.id);
+    addDownload(downloadId, track.title);
+
     try {
+      // Simular progreso
+      let progress = 10;
+      const progressInterval = setInterval(() => {
+        progress += Math.random() * 30;
+        if (progress > 90) progress = 90;
+        updateProgress(downloadId, progress);
+      }, 300);
+
       const downloadUrl = `/api/download?url=${encodeURIComponent(track.audio_url)}&name=${encodeURIComponent(track.title)}`;
       const link = document.createElement('a');
       link.href = downloadUrl;
@@ -172,8 +189,30 @@ export default function MisSetsPage() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      // Limpiar intervalo
+      clearInterval(progressInterval);
+      updateProgress(downloadId, 100);
+
+      // Simular tiempo de finalización
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Guardar registro de descarga
+      if (userId) {
+        await saveDownloadRecord(userId, track.id, track.title);
+      }
+
+      // Mostrar animación de éxito
+      completeDownload(downloadId);
+      setDownloadSuccess(track.id);
+      setTimeout(() => {
+        setDownloadSuccess(null);
+      }, 2000);
+
     } catch (error) {
       console.error('Error al descargar:', error);
+    } finally {
+      setDownloadingTrackId(null);
     }
   };
 
@@ -353,10 +392,21 @@ export default function MisSetsPage() {
                   {track.is_downloadable && (
                     <button
                       onClick={() => handleDownload(track)}
-                      className="flex-1 md:flex-none px-2 md:px-3 py-1 hover:bg-green-500/20 rounded-lg transition text-gray-400 hover:text-green-400 text-xs font-semibold"
+                      disabled={downloadingTrackId === track.id}
+                      className={`flex-1 md:flex-none px-2 md:px-3 py-1 rounded-lg transition text-xs font-semibold ${
+                        downloadSuccess === track.id
+                          ? "bg-green-500/30 text-green-400"
+                          : downloadingTrackId === track.id
+                          ? "bg-yellow-500/30 text-yellow-400 animate-pulse"
+                          : "hover:bg-green-500/20 text-gray-400 hover:text-green-400"
+                      }`}
                       title="Descargar canción"
                     >
-                      Descargar
+                      {downloadSuccess === track.id
+                        ? "✓ Descargado"
+                        : downloadingTrackId === track.id
+                        ? "Descargando..."
+                        : "Descargar"}
                     </button>
                   )}
                   <button

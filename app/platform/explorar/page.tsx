@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 import { getAllTracks } from '@/service/track.service';
 import TrackCard from '@/components/layout/TrackCard';
 import Image from 'next/image';
 
 export default function ExplorarPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [tracks, setTracks] = useState<any[]>([]);
   const [filteredTracks, setFilteredTracks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -205,6 +207,7 @@ export default function ExplorarPage() {
                 duration={track.duration}
                 content_type={track.content_type}
                 is_downloadable={track.is_downloadable}
+                userId={user?.id}
               />
             ))}
           </div>

@@ -90,3 +90,35 @@
   overflow: hidden !important;
   text-overflow: clip !important;
 }
+
+/* Download Button Animations */
+@keyframes downloadPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes successCheck {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.download-button-downloading {
+  animation: downloadPulse 1.5s ease-in-out infinite;
+}
+
+.download-button-success {
+  animation: successCheck 0.4s ease-out;
+}
