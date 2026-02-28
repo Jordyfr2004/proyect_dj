@@ -63,7 +63,7 @@ export default function PersonasPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="text-2xl font-bold text-red-500">Personas</h1>
+            <h1 className="text-2xl font-bold text-red-500">Comunidad</h1>
           </div>
 
           {/* Search Bar */}

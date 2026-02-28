@@ -229,7 +229,7 @@ export default function MisSetsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black pt-20 pb-10">
+    <div className="min-h-screen bg-black pt-4 pb-10">
       <div className="max-w-6xl mx-auto px-3 md:px-4">
         {/* Botón Regreso */}
         <a 
@@ -239,7 +239,7 @@ export default function MisSetsPage() {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          <span className="text-sm md:text-base">Volver</span>
+          
         </a>
 
         {/* Header */}

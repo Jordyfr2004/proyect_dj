@@ -124,7 +124,7 @@ export default function PlatformPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM6 20a6 6 0 0112 0v2H6v-2z" />
               </svg>
-              <span className="font-medium">Personas</span>
+              <span className="font-medium">Comunidad</span>
             </a>
             
             <a href="#" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition text-zinc-300 hover:text-red-500">
@@ -306,7 +306,7 @@ export default function PlatformPage() {
                 href="/platform/explorar"
                 className="text-red-500 hover:text-red-400 transition text-sm font-medium"
               >
-                Mostrar más →
+                Mostrar más 
               </a>
             </div>
             
@@ -359,7 +359,7 @@ export default function PlatformPage() {
                   href="/platform/personas"
                   className="text-red-500 hover:text-red-400 transition text-sm font-medium"
                 >
-                  Ver más →
+                  Ver más 
                 </a>
               </div>
               
