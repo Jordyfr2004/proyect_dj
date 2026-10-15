@@ -22,7 +22,13 @@ export async function POST() {
     }
   );
 
-  await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    return NextResponse.json(
+      { error: "No se pudo cerrar la sesión" },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
+  }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true }, { headers: { "Cache-Control": "no-store" } });
 }

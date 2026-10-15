@@ -1,165 +1,60 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+﻿import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
-import { refreshToken, isTokenExpiringSoon } from '@/service/auth.service';
-
-interface AuthState {
-  user: any;
-  loading: boolean;
-  logoutLoading: boolean;
-  isRefreshing: boolean;
-  error: string | null;
-}
+import { logoutUser } from '@/service/auth.service';
 
 export function useAuth() {
   const router = useRouter();
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    loading: true,
-    logoutLoading: false,
-    isRefreshing: false,
-    error: null,
-  });
-
-  const initRef = useRef(false);
-  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // 🔄 Refrescar token antes de que expire
-  const scheduleTokenRefresh = useCallback(async () => {
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session?.expires_at) return;
-
-      // Calcular tiempo hasta que expire el token (en ms)
-      const expiresIn = session.expires_at * 1000 - Date.now();
-      
-      // Refrescar cuando falten 5 minutos
-      const refreshIn = Math.max(0, expiresIn - 5 * 60 * 1000);
-
-      // Limpiar timeout anterior
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
-      }
-
-      if (refreshIn > 0) {
-        refreshTimeoutRef.current = setTimeout(async () => {
-          console.log('[Auth] Refrescando token...');
-          const result = await refreshToken();
-          if (result.success) {
-            console.log('[Auth] Token refrescado exitosamente');
-            scheduleTokenRefresh(); // Programar siguiente refresh
-          }
-        }, refreshIn);
-      }
-    } catch (error) {
-      console.error('[Auth] Error programando refresh:', error);
-    }
-  }, []);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [logoutLoading, setLogoutLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const loggingOut = useRef(false);
 
   useEffect(() => {
-    if (initRef.current) return;
-    initRef.current = true;
-
-    // Verificar sesión actual
-    const checkSession = async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        
-        setState((prev) => ({
-          ...prev,
-          user,
-          loading: false,
-          error: null,
-        }));
-
-        if (user) {
-          scheduleTokenRefresh();
-        }
-      } catch (error) {
-        console.error('[Auth] Error verificando sesión:', error);
-        setState((prev) => ({
-          ...prev,
-          user: null,
-          loading: false,
-          error: 'Error al verificar sesión',
-        }));
-      }
-    };
-
-    checkSession();
-
-    // Escuchar cambios de autenticación
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      const user = session?.user || null;
-      
-      setState((prev) => ({
-        ...prev,
-        user,
-        error: null,
-      }));
-
-      if (event === 'SIGNED_IN') {
-        console.log('[Auth] Usuario inició sesión');
-        scheduleTokenRefresh();
-      } else if (event === 'SIGNED_OUT') {
-        console.log('[Auth] Usuario cerró sesión');
-        if (refreshTimeoutRef.current) {
-          clearTimeout(refreshTimeoutRef.current);
-        }
-        router.push('/auth/login');
-      } else if (event === 'TOKEN_REFRESHED') {
-        console.log('[Auth] Token refrescado automáticamente');
-        scheduleTokenRefresh();
-      } else if (event === 'USER_UPDATED') {
-        console.log('[Auth] Datos del usuario actualizados');
+    let active = true;
+    let revision = 0;
+    // Keep this callback synchronous: Supabase already handles token refresh.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      revision++;
+      if (!active) return;
+      setUser(session?.user ?? null);
+      setLoading(false);
+      if (event === 'SIGNED_OUT' && !loggingOut.current) {
+        router.replace('/auth/login');
+        router.refresh();
       }
     });
-
-    return () => {
-      subscription?.unsubscribe();
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
-      }
-    };
-  }, [router, scheduleTokenRefresh]);
-
-  const logout = useCallback(async () => {
-    try {
-      setState((prev) => ({ ...prev, logoutLoading: true }));
-      await supabase.auth.signOut();
-      setState((prev) => ({
-        ...prev,
-        user: null,
-        logoutLoading: false,
-        error: null,
-      }));
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
-      }
-      router.push('/auth/login');
-    } catch (error) {
-      console.error('[Auth] Error haciendo logout:', error);
-      setState((prev) => ({
-        ...prev,
-        logoutLoading: false,
-        error: 'Error al cerrar sesión',
-      }));
-    }
+    const initialRevision = revision;
+    void supabase.auth.getUser().then(({ data, error: authError }) => {
+      if (!active || revision !== initialRevision) return;
+      setUser(data.user);
+      setLoading(false);
+      if (authError && authError.name !== 'AuthSessionMissingError') setError('No se pudo verificar la sesión.');
+      if (!data.user) router.replace('/auth/login');
+    }).catch(() => {
+      if (!active || revision !== initialRevision) return;
+      setLoading(false);
+      setError('No se pudo verificar la sesión.');
+    });
+    return () => { active = false; subscription.unsubscribe(); };
   }, [router]);
 
-  return {
-    user: state.user,
-    loading: state.loading,
-    logoutLoading: state.logoutLoading,
-    isRefreshing: state.isRefreshing,
-    error: state.error,
-    logout,
-  };
+  const logout = useCallback(async () => {
+    if (loggingOut.current) return;
+    loggingOut.current = true;
+    setLogoutLoading(true);
+    setError(null);
+    try {
+      await logoutUser();
+      // A fresh document discards prefetched authenticated routes and client state.
+      window.location.replace('/auth/login');
+    } catch {
+      loggingOut.current = false;
+      setLogoutLoading(false);
+      setError('No se pudo cerrar la sesión. Inténtalo de nuevo.');
+    }
+  }, []);
+  return { user, loading, logoutLoading, isRefreshing: false, error, logout };
 }

@@ -1,442 +1,64 @@
-"use client";
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
-import Image from "next/image";
+﻿"use client";
+import { useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import Link from "next/link";
+import styles from "./page.module.css";
 
+function Waveform() {
+  return <div className={styles.waveform} aria-hidden="true">{Array.from({ length: 36 }, (_, i) => <i key={i} style={{ height: `${18 + (i * 37 + 13) % 78}%`, animationDelay: `${i % 9 * -.16}s` } as CSSProperties} />)}</div>;
+}
+const features = [
+  { number: "01", title: "Encuentra tu próximo track.", text: "Explora música y descubre nuevos sonidos para darle identidad a tu próxima sesión.", tag: "EXPLORA", href: "/platform/explorar", action: "Explorar música" },
+  { number: "02", title: "Tu selección. Tu firma.", text: "Comparte tus sets y edits. Dale un lugar a las mezclas que llevan tu estilo.", tag: "COMPARTE", href: "/platform/mis-sets", action: "Compartir mis sets" },
+  { number: "03", title: "Conecta en otra frecuencia.", text: "Descubre otros DJs, visita sus perfiles y encuentra inspiración en la comunidad.", tag: "CONECTA", href: "/platform/personas", action: "Conocer la comunidad" },
+];
 export default function Home() {
-  const router = useRouter();
-  const [isChecking, setIsChecking] = useState(true);
-  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
-  const [scrollY, setScrollY] = useState(0);
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const checkRef = useRef(false);
-
-  // ✅ Verificar sesión y redirigir a platform si existe
-  useEffect(() => {
-    if (checkRef.current) return;
-    checkRef.current = true;
-
-    const checkSession = async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (user) {
-          // Usuario autenticado → ir a platform
-          router.push("/platform");
-          return;
-        }
-
-        // No hay usuario → mostrar página de inicio
-        setIsChecking(false);
-      } catch (error) {
-        console.error("[Home] Error verificando sesión:", error);
-        setIsChecking(false);
-      }
-    };
-
-    checkSession();
-  }, [router]);
-
-  useEffect(() => {
-    // Scroll listener para capturar scrollY
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Intersection Observer para elementos que aparecen al scroll
-  useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleCards((prev) => new Set(prev).add(entry.target.id));
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
-    );
-
-    const cards = document.querySelectorAll("[data-reveal]");
-    cards.forEach((card) => observerRef.current?.observe(card));
-
-    return () => observerRef.current?.disconnect();
-  }, []);
-
-  // Si está verificando sesión, no mostrar nada
-  if (isChecking) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-zinc-400">Cargando...</div>
-      </div>
-    );
+  const [paused, setPaused] = useState(false);
+  const scene = useRef<HTMLDivElement>(null);
+  function resetTilt() { scene.current?.style.setProperty("--rx", "0deg"); scene.current?.style.setProperty("--ry", "0deg"); }
+  function tilt(event: PointerEvent<HTMLDivElement>) {
+    if (paused || event.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    scene.current?.style.setProperty("--ry", `${((event.clientX - bounds.left) / bounds.width - .5) * 16}deg`);
+    scene.current?.style.setProperty("--rx", `${-((event.clientY - bounds.top) / bounds.height - .5) * 12}deg`);
   }
-
-
-
-  return (
-    <div className="bg-black text-zinc-200 scroll-smooth relative overflow-x-hidden">
-      {/* HERO */}
-      <section
-        id="hero"
-        className="relative min-h-screen w-full overflow-hidden"
-      >
-        {/* Imagen de fondo tipo DJ */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: 'url("https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1920&h=1080&fit=crop")',
-          }}
-        >
-          {/* Gradiente oscuro superpuesto */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80"></div>
+  return <div className={`${styles.landing} ${paused ? styles.paused : ""}`}>
+    <a href="#main" className={styles.skip}>Saltar al contenido</a>
+    <header className={styles.header}>
+      <Link href="/" className={styles.brand} aria-label="Zona Mix, inicio"><span className={styles.brandIcon} aria-hidden="true">▥</span>ZONA<span>MIX</span><sup>®</sup></Link>
+      <nav aria-label="Navegación principal"><a href="#features">La experiencia</a><a href="#community">Comunidad</a></nav>
+      <Link href="/auth/login" className={styles.login}>Iniciar sesión <span aria-hidden="true">↗</span></Link>
+    </header>
+    <main id="main">
+      <section className={styles.hero} aria-labelledby="hero-title">
+        <div className={styles.heroCopy}>
+          <p className={styles.eyebrow}><span /> EL PUNTO DE ENCUENTRO DE LOS DJs</p>
+          <h1 id="hero-title">Tu sonido.<br />Tu zona.<br /><em>Sin límites.</em></h1>
+          <p className={styles.intro}>La próxima gran mezcla empieza aquí. Descubre música, comparte tus sets y conecta con quienes viven al mismo ritmo que tú.</p>
+          <div className={styles.actions}><Link href="/auth/register" className={styles.primary}>Entra en la zona <span aria-hidden="true">↗</span></Link><a href="#features" className={styles.secondary}>Descubre la experiencia <span aria-hidden="true">↓</span></a></div>
+          <p className={styles.heroNote}>◎ &nbsp; HECHO PARA DJs. MOVIDO POR LA MÚSICA.</p>
         </div>
-
-        {/* Contenido superpuesto */}
-        <div className="relative z-10 h-full min-h-screen flex flex-col items-center justify-center text-center px-6">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white animate-fadeIn drop-shadow-lg mb-4">
-            ZONA MIX
-          </h1>
-
-          <p className="mt-4 sm:mt-6 max-w-3xl text-base sm:text-lg md:text-xl text-zinc-200 leading-relaxed animate-fadeIn delay-200">
-            Plataforma profesional para DJs que dominan la noche.
-            Control total. Comunidad real. Sonido sin límites.
-            <br className="hidden md:block" />
-            
-          </p>
-
-          <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row gap-4 animate-fadeIn delay-300">
-            <a
-              href="/auth/login"
-              className="px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg rounded-full bg-red-900 hover:bg-red-800 transition-all duration-300 shadow-lg shadow-red-900/60 hover:scale-105 font-semibold"
-            >
-              Empezar
-            </a>
-
-            <a
-              href="#community"
-              className="px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg rounded-full border-2 border-zinc-200 hover:border-red-500 hover:text-red-400 transition-all duration-300 hover:scale-105 font-semibold"
-            >
-              Comunidad
-            </a>
+        <div className={styles.visual} onPointerMove={tilt} onPointerLeave={resetTilt}>
+          <div className={styles.orbit} aria-hidden="true" /><span className={styles.visualLabel}>THE SOUND OF YOUR NEXT SET</span>
+          <div ref={scene} className={styles.scene} aria-hidden="true">
+            <div className={styles.deck}>
+              <div className={styles.deckTop}><span>ZM / ANALOG SERIES</span><span className={styles.led} /></div>
+              <div className={styles.record}><div className={styles.recordLabel}><span>ZONA MIX</span><strong>ZM</strong><small>SIDE A · 33⅓ RPM</small></div><div className={styles.spindle} /></div>
+              <div className={styles.tonearm}><i /></div>
+              <div className={styles.deckBottom}><span className={styles.power}>●</span><span>DIRECT DRIVE<br /><b>FEEL THE FREQUENCY</b></span><span className={styles.deckDots}>▪ ▪ ▪</span></div>
+            </div>
+            <div className={styles.floatingTag}><span className={styles.led} /> EN TU FRECUENCIA <span>↗</span></div>
+            <div className={styles.soundCard}><span>EL RITMO NO SE DETIENE</span><b>Tu próximo gran set.</b><Waveform /></div>
           </div>
+          <div className={styles.visualBottom}><span>VOL. 001 / ZONA MIX</span><button type="button" aria-pressed={paused} onClick={() => { resetTilt(); setPaused(!paused); }}>{paused ? "▶ Activar animaciones" : "Ⅱ Pausar animaciones"}</button></div>
         </div>
       </section>
-
-      {/* FEATURES */}
-      <section
-        id="features"
-        className="min-h-screen flex flex-col items-center justify-center px-0 sm:px-6 py-16 relative overflow-hidden bg-black"
-      >
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-12 text-zinc-100 relative z-10 animate-fadeIn">
-          Lo que puedes hacer
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 sm:gap-8 max-w-7xl relative z-10 w-full">
-
-          {/* Descargar Música */}
-          <div 
-            id="card-1"
-            data-reveal
-            className="group relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer md:animate-glow-red"
-            style={{
-              opacity: visibleCards.has("card-1") ? 1 : 0,
-              transform: visibleCards.has("card-1") 
-                ? `scale(1)` 
-                : `scale(0.8)`,
-              transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
-            }}
-          >
-            <div 
-              className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
-              style={{
-                backgroundImage: 'url("https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=800&h=600&fit=crop")',
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-            </div>
-            <div className="absolute inset-0 flex flex-col justify-end p-8">
-              <h3 className="text-3xl font-bold text-white mb-3">
-                DESCARGAR MÚSICA
-              </h3>
-              <p className="text-zinc-300 text-base">
-                Accede a miles de canciones para descargar y usar en tus sets. Música de calidad profesional para todos los géneros.
-              </p>
-            </div>
-          </div>
-
-          {/* Playlists de otros DJs */}
-          <div 
-            id="card-2"
-            data-reveal
-            className="group relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer md:animate-glow-red"
-            style={{
-              opacity: visibleCards.has("card-2") ? 1 : 0,
-              transform: visibleCards.has("card-2") 
-                ? `scale(1)` 
-                : `scale(0.8)`,
-              transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s",
-            }}
-          >
-            <div 
-              className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
-              style={{
-                backgroundImage: 'url("https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&h=600&fit=crop")',
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-            </div>
-            <div className="absolute inset-0 flex flex-col justify-end p-8">
-              <h3 className="text-3xl font-bold text-white mb-3">
-                PLAYLISTS DE DJs
-              </h3>
-              <p className="text-zinc-300 text-base">
-                Descubre y accede a playlists curadas por otros DJs profesionales. Inspírate con sus mejores selecciones.
-              </p>
-            </div>
-          </div>
-
-          {/* Venta de Remixes */}
-          <div 
-            id="card-3"
-            data-reveal
-            className="group relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer md:animate-glow-red"
-            style={{
-              opacity: visibleCards.has("card-3") ? 1 : 0,
-              transform: visibleCards.has("card-3") 
-                ? `scale(1)` 
-                : `scale(0.8)`,
-              transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s",
-            }}
-          >
-            <div 
-              className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
-              style={{
-                backgroundImage: 'url("https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800&h=600&fit=crop")',
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-            </div>
-            <div className="absolute inset-0 flex flex-col justify-end p-8">
-              <h3 className="text-3xl font-bold text-white mb-3">
-                VENTA DE REMIXES
-              </h3>
-              <p className="text-zinc-300 text-base">
-                Compra y vende remixes entre colegas
-              </p>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Grid secundario para las 2 últimas tarjetas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 sm:gap-8 max-w-7xl relative z-10 w-full mt-8">
-
-          {/* DJ EDITS + TOOLS */}
-          <div 
-            id="card-4"
-            data-reveal
-            className="group relative h-80 rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer md:animate-glow-red"
-            style={{
-              opacity: visibleCards.has("card-4") ? 1 : 0,
-              transform: visibleCards.has("card-4") 
-                ? `scale(1)` 
-                : `scale(0.8)`,
-              transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.45s",
-            }}
-          >
-            <div 
-              className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
-              style={{
-                backgroundImage: 'url("https://images.unsplash.com/photo-1501612780353-7e5c60a586d5?w=800&h=600&fit=crop")',
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-            </div>
-            <div className="absolute inset-0 flex flex-col justify-end p-8">
-              <h3 className="text-3xl font-bold text-white mb-3">
-                SETS EDITS
-              </h3>
-              <p className="text-zinc-300 text-base">
-                SET Edits personalizados que incluyen versiones Intro, Clean, Transición y mucho más.
-              </p>
-            </div>
-          </div>
-
-          {/* Aplicaciones Digitales */}
-          <div 
-            id="card-5"
-            data-reveal
-            className="group relative h-80 rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-900/50 transition-all duration-500 hover:scale-105 cursor-pointer md:animate-glow-red"
-            style={{
-              opacity: visibleCards.has("card-5") ? 1 : 0,
-              transform: visibleCards.has("card-5") 
-                ? `scale(1)` 
-                : `scale(0.8)`,
-              transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s",
-            }}
-          >
-            <div 
-              className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900"
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-            </div>
-            <div className="absolute inset-0 flex flex-col justify-end p-20">
-              <h3 className="text-3xl sm:text-4xl font-bold text-white mb-3 leading-relaxed">
-                <span className="block">MÚSICA AL</span>
-                <span className="block pl-4 sm:pl-10 md:pl-10">ALCANCE DE</span>
-                <span className="block pl-8 sm:pl-20 md:pl-26">TUS MANOS</span>
-              </h3>
-            </div>
-          </div>
-
-        </div>
+      <div className={styles.genreStrip} aria-label="Todos los estilos, una misma zona"><span>HOUSE</span><i>✳</i><span>REGGAETÓN</span><i>✳</i><span>TECHNO</span><i>✳</i><span>LATIN</span><i>✳</i><span>OPEN FORMAT</span></div>
+      <section id="features" className={styles.features} aria-labelledby="features-title">
+        <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>EL SIGUIENTE NIVEL DE TU SESIÓN</p><h2 id="features-title">Más que música.<br /><span>Todo un movimiento.</span></h2></div><p>De ese primer track a la última mezcla.<br />Haz espacio para lo que viene.</p></div>
+        <div className={styles.featureGrid}>{features.map(feature => <Link href={feature.href} key={feature.number} className={styles.feature}><div className={styles.featureTop}><span>{feature.number} / {feature.tag}</span><span aria-hidden="true">↗</span></div><div className={styles.featureArt} aria-hidden="true">{feature.number === "01" ? <><div className={styles.miniRecord} /><div className={styles.miniSleeve}>FIND<br />YOUR<br /><em>SOUND.</em></div></> : feature.number === "02" ? <div className={styles.mixArt}><span>YOUR NEXT SESSION</span><Waveform /><span>INTRO / EDIT / MIX</span></div> : <div className={styles.networkArt}><span>DJ</span><span>ZM</span><span>DJ</span><i /><i /></div>}</div><h3>{feature.title}</h3><p>{feature.text}</p><span className={styles.featureAction}>{feature.action} <span aria-hidden="true">↗</span></span></Link>)}</div>
       </section>
-
-      {/* Animaciones globales */}
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes slide {
-          0% {
-            transform: translateY(0);
-          }
-          100% {
-            transform: translateY(60px);
-          }
-        }
-
-        @keyframes bounce {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-15px);
-          }
-        }
-
-        @keyframes bass-pulse {
-          0%, 100% {
-            transform: scale(1);
-            opacity: 0.3;
-          }
-          50% {
-            transform: scale(1.2);
-            opacity: 0.6;
-          }
-        }
-
-        .animate-fadeIn {
-          animation: fadeIn 1s ease forwards;
-        }
-
-        .delay-200 {
-          animation-delay: 0.2s;
-        }
-
-        .delay-300 {
-          animation-delay: 0.3s;
-        }
-
-        /* Smooth scroll behavior */
-        html {
-          scroll-behavior: smooth;
-        }
-
-        /* Card hover glow */
-        div[data-reveal]:hover {
-          box-shadow: 0 0 30px rgba(127, 29, 29, 0.5) !important;
-        }
-
-        /* Animate pulse */
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.5;
-          }
-        }
-
-        .animate-pulse {
-          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        .animate-bounce {
-          animation: bounce 1s infinite;
-        }
-
-        .animate-bass-pulse {
-          animation: bass-pulse 0.6s ease-in-out infinite;
-        }
-
-        /* Glow rojo oscuro destello solo en pantallas grandes */
-        @keyframes glow-red {
-          0%, 100% {
-            box-shadow: 0 0 20px rgba(127, 29, 29, 0.4), 0 0 40px rgba(127, 29, 29, 0.2);
-          }
-          50% {
-            box-shadow: 0 0 30px rgba(153, 27, 27, 0.6), 0 0 60px rgba(127, 29, 29, 0.3);
-          }
-        }
-
-        @media (min-width: 768px) {
-          .md\\:animate-glow-red {
-            animation: glow-red 3s ease-in-out infinite !important;
-          }
-        }
-
-        /* Perspective para 3D */
-        div[data-reveal] {
-          perspective: 1000px;
-        }
-      `}</style>
-    </div>
-  );
+      <section id="community" className={styles.community} aria-labelledby="community-title"><div className={styles.communityArt} aria-hidden="true"><div /><div /><div /><span>ZM</span></div><div className={styles.communityCopy}><p className={styles.eyebrow}>DIFERENTES ESTILOS. LA MISMA PASIÓN.</p><h2 id="community-title">La música conecta.<br /><em>Tú pones el ritmo.</em></h2><p>Hay un mundo de sonidos al otro lado de tu cabina. Comparte lo que creas, descubre a otros DJs y encuentra tu lugar en Zona Mix.</p><Link href="/auth/register" className={styles.primary}>Únete a la comunidad <span aria-hidden="true">↗</span></Link></div></section>
+    </main>
+    <footer className={styles.footer}><Link href="/" className={styles.brand}>ZONA<span>MIX</span><sup>®</sup></Link><p>Tu sonido merece su propia zona.</p><a href="#main">Volver arriba ↑</a></footer>
+  </div>;
 }
-
-/* ICONOS SVG */
-
-function MixerIcon() {
-  return (
-    <svg className="w-10 h-10 text-red-700 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-      <path d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  );
-}
-
-function WaveIcon() {
-  return (
-    <svg className="w-10 h-10 text-red-700 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-      <path d="M3 12c2-6 4 6 6 0s4 6 6 0 4 6 6 0" />
-    </svg>
-  );
-}
-
-function NetworkIcon() {
-  return (
-    <svg className="w-10 h-10 text-red-700 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-      <circle cx="6" cy="12" r="2" />
-      <circle cx="18" cy="12" r="2" />
-      <path d="M8 12h8" />
-    </svg>
-  );
-}
-

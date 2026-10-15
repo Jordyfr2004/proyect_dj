@@ -19,14 +19,16 @@ export default function LoginPage() {
   // Verificar si ya está logueado
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        router.replace("/platform");
-      } else {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) router.replace("/platform");
+      } finally {
         setCheckingAuth(false);
       }
     };
-    checkAuth();
+    void checkAuth().catch(() => {
+      setMessage({ type: "error", text: "No se pudo verificar la sesión. Puedes intentar iniciar sesión de nuevo." });
+    });
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -49,9 +51,7 @@ export default function LoginPage() {
       setMessage({ type: "success", text: "Sesión iniciada correctamente" });
       setForm({ email: "", password: "" });
       
-      setTimeout(() => {
-        router.push("/platform");
-      }, 1500);
+      window.location.replace("/platform");
     } catch (error) {
       setMessage({ type: "error", text: "Error en la solicitud" });
       setLoading(false);
@@ -60,6 +60,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <a href="/" className="fixed top-6 left-6 z-[60] rounded-lg border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm text-zinc-200 hover:border-red-500 focus-visible:outline-2 focus-visible:outline-red-500">
+        ← Volver al inicio
+      </a>
       {/* Gradiente radial de fondo */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(127,29,29,0.15),_transparent_70%)]" />
       
